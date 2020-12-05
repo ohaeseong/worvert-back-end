@@ -2,7 +2,7 @@ import { Service } from 'typedi';
 import { Response } from 'express';
 import { PostService } from '../../services/post.service';
 import { AuthRequest } from '../../typings'; 
-import * as Validate  from '../../lib/validate';
+import * as Validate  from '../../lib/validate/post.validate';
 import { generatedId } from '../../lib/method.lib';
 import * as colorConsole from '../../lib/console';
 import config from '../../../config';
@@ -17,6 +17,7 @@ export class PostCtrl {
   
   // 게시글 리스트 조회 함수
   public getPosts = async (req: AuthRequest, res: Response) => {
+    colorConsole.info('[GET] post list lookup api was called');
     const page: string  = req.query.page as string;
     const category: string  = req.query.category as string;
 
@@ -58,6 +59,7 @@ export class PostCtrl {
 
   // 게시글 상세 조회 함수
   public getPostById = async (req: AuthRequest, res: Response) => {
+    colorConsole.info('[GET] post detail data lookup api was called');
     const id: string  = req.params.id as string;
 
     // id의 요청 방식이 올바른지 확인 하는 코드입니다.
@@ -102,6 +104,7 @@ export class PostCtrl {
 
   // 게시글 작성 함수
   public writePost = async (req: AuthRequest, res: Response) => {
+    colorConsole.info('[POST] post write api was called');
     const { body } = req;
 
     try {
@@ -147,6 +150,7 @@ export class PostCtrl {
 
   // 게시글 수정 함수
   public updatePost = async (req: AuthRequest, res: Response) => {
+    colorConsole.info('[PUT] post update api was called');
     const { body, decoded } = req;
     
     // validate 라이브러리를 사용해 요청 form을 검사합니다.
@@ -195,6 +199,7 @@ export class PostCtrl {
 
   // 게시글 삭제 함수
   public deletePost = async (req: AuthRequest, res: Response) => {
+    colorConsole.info('[DELETE] post delete api was called');
     const { decoded } = req;
     let id: string = req.query.id as string; 
 
@@ -209,6 +214,19 @@ export class PostCtrl {
     }
 
     try {
+
+      // 어드민 권한으로 해당 게시글을 삭제 합니다. delete anyway into admin access level
+      if (decoded.accessLever === 0) {
+          // 요청 받은 게시글 id를 기준으로 데이터를 삭제합니다. 
+          await this.postService.deletePostByIdx(id);
+
+          res.status(200).json({
+            status: 200,
+            message: '게시글 삭제 성공 (어드민)',
+          });
+
+          return;
+      }
 
       // 삭제를 요청 하는 사용자의 id와 해당 게시글의 작성자를 대조하여 권한을 식별합니다.
       const post = await this.postService.getPostForDiscrimination(id, decoded.memberId);

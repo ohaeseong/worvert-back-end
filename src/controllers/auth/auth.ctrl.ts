@@ -2,7 +2,7 @@ import { Response } from 'express';
 import { Service } from "typedi";
 import { AuthService } from "../../services/auth.service";
 import { AuthRequest } from "../../typings";
-import * as Validate from '../../lib/validate';
+import * as Validate from '../../lib/validate/auth.validate';
 import * as tokenLib from '../../lib/token.lib';
 import * as colorConsole from '../../lib/console';
 
@@ -14,6 +14,7 @@ export class AuthCtrl {
 
   // 사용자 로그인 함수
   public login = async (req: AuthRequest, res: Response) => {
+    colorConsole.info('[POST] user login api was called');
     const { body } = req;
 
     // 로그인 요청 값 검사

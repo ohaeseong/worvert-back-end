@@ -51,7 +51,7 @@ export class PostService {
     return result;
   }
 
-  // 게시글 id별 조회
+  // 게시글 작성자 식별을 위한 함수
   public async getPostForDiscrimination(id: string, writer: string) {
     const result = await this.postRepo.findOne({
       where: {

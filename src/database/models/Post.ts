@@ -27,6 +27,6 @@ export class Post extends BaseEntity {
   @Column({ type: 'timestamp', default: () => "CURRENT_TIMESTAMP" })
   create_time: string;
 
-  @Column({ type: 'timestamp', nullable: true, default: () => "CURRENT_TIMESTAMP" })
+  @Column({ type: 'timestamp', nullable: true})
   update_time: string;
 }
