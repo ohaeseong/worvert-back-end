@@ -1,11 +1,12 @@
 import { Service } from 'typedi';
 import { Response } from 'express';
 import { PostService } from '../../services/post.service';
-import { AuthRequest } from '../../typings'; 
+import { AuthRequest, PostDetail } from '../../typings'; 
 import * as Validate  from '../../lib/validate/post.validate';
 import { generatedId } from '../../lib/method.lib';
 import * as colorConsole from '../../lib/console';
 import config from '../../../config';
+import { PostCommentService } from '../../services/post.comment.service';
 
 const { replace } = config;
 
@@ -13,6 +14,7 @@ const { replace } = config;
 export class PostCtrl {
   constructor(
     private postService: PostService,
+    private commentService: PostCommentService,
   ) { }
   
   // 게시글 리스트 조회 함수
@@ -75,7 +77,7 @@ export class PostCtrl {
     try {
 
       // DB에 있는 데이터를 조회 합니다.
-      const post = await this.postService.getPostById(id);
+      const post: PostDetail = await this.postService.getPostById(id);
 
       if(!post) {
         res.status(404).json({
@@ -85,6 +87,12 @@ export class PostCtrl {
 
         return;
       }
+
+      const commentData = await this.commentService.getPostCommentList(5);
+
+      post.commentList = {
+        commentData,
+      };
 
       res.status(200).json({
         status: 200,

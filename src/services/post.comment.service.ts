@@ -13,9 +13,9 @@ export class PostCommentService {
     // 게시글 작성 함수
     public async createPostComment(commentTxt: string, memberId: string, postId: string) {
         const commentData = await this.commentRepo.save({
-            commentTxt,
-            memberId,
-            postId,
+            comment_txt: commentTxt,
+            member_id: memberId,
+            post_id: postId,
         });
 
         return commentData;
@@ -38,7 +38,7 @@ export class PostCommentService {
         const commentData = await this.commentRepo.update({
             idx,
         }, {
-            commentTxt,
+            comment_txt: commentTxt,
         });
 
         return commentData;

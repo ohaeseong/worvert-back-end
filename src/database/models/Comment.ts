@@ -1,12 +1,13 @@
-import { BaseEntity, Column, Entity, PrimaryColumn } from "typeorm";
+import { BaseEntity, Column, Entity, Generated, PrimaryColumn } from "typeorm";
 
 @Entity()
 export class Comment extends BaseEntity {
     @PrimaryColumn({ type: 'int', unique: true })
+    @Generated('increment')
     idx: number;
 
     @Column({ type: 'varchar', length: 1000 })
-    commentTxt: string;
+    comment_txt: string;
 
     @Column({ type: 'varchar', length: 50 })
     member_id: string;

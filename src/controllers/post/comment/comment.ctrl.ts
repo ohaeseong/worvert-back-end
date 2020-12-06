@@ -38,6 +38,8 @@ export class CommentCtrl {
                 },
             });
         } catch (error) {
+            colorConsole.error(error);
+
             res.status(500).json({
                 status: 500,
                 message: 'server error!',
@@ -57,6 +59,8 @@ export class CommentCtrl {
                 status: 400,
                 message: 'comment create body form is wrong!',
             });
+
+            return;
         }
 
         try {
@@ -70,6 +74,8 @@ export class CommentCtrl {
                 message: 'create comment success!',
             });
         } catch (error) {
+            colorConsole.error(error);
+
             res.status(500).json({
                 status: 500,
                 message: 'server error!',
@@ -111,6 +117,8 @@ export class CommentCtrl {
                 message: 'update comment success!',
             });
         } catch (error) {
+            colorConsole.error(error);
+
             res.status(500).json({
                 status: 500,
                 message: 'server error!',
@@ -161,6 +169,8 @@ export class CommentCtrl {
                 message: 'delete comment success!',
             });
         } catch (error) {
+            colorConsole.error(error);
+
             res.status(500).json({
                 status: 500,
                 message: 'server error!',
