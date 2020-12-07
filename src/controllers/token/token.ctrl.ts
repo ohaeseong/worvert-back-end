@@ -50,10 +50,15 @@ export class TokenCtrl {
             });
         } catch (error) {
             colorConsole.error(error);
-
-            res.status(500).json({
-                status: 500,
-                message: 'server error!',
+                // 에러 검색후 status, message 값 받기
+            let [status, message] = tokenLib.searchTokenError(error);
+            
+            // status 타입 변경
+            status = status as number;
+            
+            res.status(status).json({
+                status,
+                message,
             });
         } 
     }

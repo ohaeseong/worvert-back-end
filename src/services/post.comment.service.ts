@@ -55,9 +55,18 @@ export class PostCommentService {
 
     // 댓글 작성자 식별을 위한 함수
     public async getCommentForDiscrimination(idx: number, memberId: string) {
-        const commentData = await this.commentRepo.find({
+        const commentData = await this.commentRepo.findOne({
             idx,
             member_id: memberId,
+        });
+
+        return commentData;
+    }
+
+    // idx로 댓글 조회
+    public async getCommentByIdx(idx: number) {
+        const commentData = await this.commentRepo.findOne({
+            idx,
         });
 
         return commentData;

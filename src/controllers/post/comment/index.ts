@@ -23,8 +23,8 @@ export class CommentRoute {
     private setRouter() {
         this.router.post('/',authMiddleWare, Container.get(CommentCtrl).createComment);
         this.router.get('/', Container.get(CommentCtrl).getComments);
-        this.router.put('/',authMiddleWare, Container.get(CommentCtrl).updateComment);
-        this.router.delete('/',authMiddleWare, Container.get(CommentCtrl).deleteComment);
+        this.router.put('/', authMiddleWare, Container.get(CommentCtrl).updateComment);
+        this.router.delete('/', authMiddleWare, Container.get(CommentCtrl).deleteComment);
     }
 
     public getRouter() {
