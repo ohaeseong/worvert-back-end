@@ -1,17 +1,17 @@
 import colors from 'colors';
 
-export const success = (txt: string) => {
-    console.log(colors.green(txt));
+export const success = (content: any) => {
+    console.log(colors.green(content));
 };
 
-export const error = (txt: string) => {
-    console.log(colors.red(txt));
+export const error = (content: any) => {
+    console.log(colors.red(content));
 };
 
-export const warning = (txt: string) => {
-    console.log(colors.yellow(txt));
+export const warning = (content: any) => {
+    console.log(colors.yellow(content));
 };
 
-export const info = (txt: string) => {
-    console.log(colors.gray(txt));
+export const info = (content: any) => {
+    console.log(colors.gray(content));
 };

@@ -4,6 +4,7 @@ import { PostCtrl } from './post.ctrl';
 import authMiddleWare from '../../middlewares/auth.middleware';
 import { CommentRoute } from './comment';
 
+// dependency injection type di
 @Service()
 export class PostRoute {
   // 변수 router 선언
