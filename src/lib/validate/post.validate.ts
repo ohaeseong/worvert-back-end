@@ -6,6 +6,7 @@ export const writePostValidate = (body: Object) => {
       title: Joi.string().max(50).required(),
       contents: Joi.string().required(),
       category: Joi.string().required(),
+      series: Joi.string().allow(null).allow(''),
       thumbnailAddress: Joi.string().allow(null).allow(''),
     });
   
@@ -18,7 +19,7 @@ export const updatePostValidate = (body: Object) => {
       id: Joi.string().required(),
       title: Joi.string().max(50).required(),
       contents: Joi.string().required(),
-      thumbnailAddress: Joi.string().allow(null),
+      thumbnailAddress: Joi.string().allow(null).allow(''),
     });
   
     return schema.validateAsync(body);

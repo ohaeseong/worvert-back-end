@@ -9,7 +9,6 @@ import { CommentRoute } from './comment';
 export class PostRoute {
   // 변수 router 선언
   private router: Router;
-  private app: Express;
 
   // 의존성 주입을 위한 객체 선언
   constructor(
@@ -17,7 +16,7 @@ export class PostRoute {
   ) {
     // Router 함수 값 선언
     this.router = Router();
-    // this.app = express();
+
     // setRouter 실행
     this.setRouter();
   }

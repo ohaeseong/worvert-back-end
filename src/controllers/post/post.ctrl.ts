@@ -1,7 +1,7 @@
 import { Service } from 'typedi';
 import { Response } from 'express';
 import { PostService } from '../../services/post.service';
-import { AuthRequest, PostDetail } from '../../typings'; 
+import { AuthRequest, PostDetail, PostWriteForm } from '../../typings'; 
 import * as Validate  from '../../lib/validate/post.validate';
 import { generatedId } from '../../lib/method.lib';
 import * as colorConsole from '../../lib/console';
@@ -113,7 +113,7 @@ export class PostCtrl {
   // 게시글 작성 함수
   public writePost = async (req: AuthRequest, res: Response) => {
     colorConsole.info('[POST] post write api was called');
-    const { body } = req;
+    const { body, decoded } = req;
 
     try {
       // validate 라이브러리를 사용해 요청 form을 검사합니다.
@@ -130,8 +130,10 @@ export class PostCtrl {
     }
 
     try {
-      const { title, contents, category } = body;
+      const { memberId } = decoded;
+      const { title, contents, category, series } = body;
       let { thumbnailAddress } = body;
+      
 
       const id: string = await generatedId();
 
@@ -139,9 +141,18 @@ export class PostCtrl {
         thumbnailAddress = `https://${replace}/static/img/thumbnail_default.png`;
       }
       
+      const postFormData = {
+        id,
+        title,
+        contents,
+        category,
+        thumbnailAddress,
+        series,
+        writer: memberId,
+      } as PostWriteForm;
 
       // DB에 저장하는 함수를 실행합니다.
-      await this.postService.createPost(id, title, contents, category, thumbnailAddress);
+      await this.postService.createPost(postFormData);
 
       res.status(200).json({
         status: 200,
