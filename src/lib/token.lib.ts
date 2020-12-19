@@ -25,7 +25,7 @@ export const createRefreshToken = (memberId: string) => {
     memberId,
   };
 
-  const option = { expiresIn: '7 days', issuer: 'tech-diary.com', subject: 'token' };
+  const option = { expiresIn: '7 days', issuer: 'tech-diary.com', subject: 'refresh' };
 
   try {
     return jwt.sign(payload, jwtSecret, option);

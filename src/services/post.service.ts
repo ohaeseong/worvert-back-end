@@ -1,6 +1,7 @@
 import { Service } from 'typedi';
 import { Repository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
+import { PostWriteForm } from '../typings';
 
 import { Post } from '../database/models/Post';
 
@@ -51,7 +52,7 @@ export class PostService {
     return result;
   }
 
-  // 게시글 id별 조회
+  // 게시글 작성자 식별을 위한 함수
   public async getPostForDiscrimination(id: string, writer: string) {
     const result = await this.postRepo.findOne({
       where: {
@@ -64,13 +65,9 @@ export class PostService {
   }
 
   // 게시글 작성
-  public async createPost(id:string, title: string, contents: string, category: string, thumbnail_address?: string) {
+  public async createPost(body: PostWriteForm) {
     const post = await this.postRepo.save({
-      id,
-      title,
-      category,
-      contents,
-      thumbnail_address,
+      ...body
     });
 
     return post;

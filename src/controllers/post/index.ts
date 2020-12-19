@@ -1,8 +1,10 @@
-import { Router } from 'express';
-import { Service } from 'typedi';
+import express, { Router, Express } from 'express';
+import Container, { Service } from 'typedi';
 import { PostCtrl } from './post.ctrl';
 import authMiddleWare from '../../middlewares/auth.middleware';
+import { CommentRoute } from './comment';
 
+// dependency injection type di
 @Service()
 export class PostRoute {
   // 변수 router 선언
@@ -14,6 +16,7 @@ export class PostRoute {
   ) {
     // Router 함수 값 선언
     this.router = Router();
+
     // setRouter 실행
     this.setRouter();
   }
@@ -21,10 +24,13 @@ export class PostRoute {
   // postCtrl의 함수들을 각각 요청 경로에 따라 route 시켜주는 함수
   private setRouter() {
     this.router.get('/', this.postCtrl.getPosts);
-    this.router.get('/:id', this.postCtrl.getPostById);
+    this.router.get('/detail/:id', this.postCtrl.getPostById);
     this.router.post('/', authMiddleWare, this.postCtrl.writePost);
     this.router.put('/', authMiddleWare, this.postCtrl.updatePost);
     this.router.delete('/', authMiddleWare, this.postCtrl.deletePost);
+
+    // comment api route setting
+    this.router.use('/comment', Container.get(CommentRoute).getRouter());
   }
 
   // postRouter 값 리턴 함수 (외부에서 router  접근이 가능 하도록 만든 함수)

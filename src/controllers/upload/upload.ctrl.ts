@@ -10,6 +10,7 @@ export class UploadCtrl {
 
   // 이미지 업로드
   public uploadImgs = async (req: AuthRequest, res: Response) => {
+    colorConsole.info('[POST] image upload api was called');
     const { files } = req;
     const imgs = [];
 
