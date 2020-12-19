@@ -63,6 +63,7 @@ export class PostCtrl {
   public getPostById = async (req: AuthRequest, res: Response) => {
     colorConsole.info('[GET] post detail data lookup api was called');
     const id: string  = req.params.id as string;
+    console.log(id);
     
     // id의 요청 방식이 올바른지 확인 하는 코드입니다.
     if (!id) {

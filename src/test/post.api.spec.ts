@@ -1,6 +1,5 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import { Repository } from 'typeorm';
 
 import config from '../../config';
 import { Post } from '../database/models/Post';
@@ -38,28 +37,10 @@ describe('PostService', async () => {
     });
 
     context("Read Post List", () => {
-        // beforeEach(async ()  => {
-
-        //     Promise.all([]).then(async () => {
-        //         await Post.save({
-        //             ...postFormData,
-        //         });
-        //     });
-        // });
-
-        // afterEach(async () => {
-        //     await Promise.all([]).then(() => {
-        //         Post.delete({
-        //             id: 'test'
-        //         });
-        //     });
-        // });
-
-
         it('should return 200 status code', (done) => {
             const params = {
                 page: 0,
-                category: 'server',
+                category: 'test category',
             };
 
             chai.request(serverAddress)
@@ -90,7 +71,7 @@ describe('PostService', async () => {
         before(()  => {
             Post.save({
                 ...postFormData,
-            });
+            });  
         });
 
         after(() => {
@@ -100,29 +81,17 @@ describe('PostService', async () => {
         });
 
         it('should return 200', (done) => {
-            const params = { id: 'test', };
+            const params = { id: 'test' };
 
-            chai.request(serverAddress)
-                .get(`/api/post/detail/:id`)
-                .send(params)
+            setTimeout(() => {
+                chai.request(serverAddress)
+                .get('/api/post/detail/' + params.id)
                 .end((err, res) => {
                     if (err) { colorConsole.error(err); }
                     res.should.have.status(200);
                     done();
                 });
-        });
-
-        it('should return 400', (done) => {
-            const params = { id: 'test12' };
-
-            chai.request(serverAddress)
-                .get(`/api/post/detail/`)
-                .send(params)
-                .end((err, res) => {
-                    if (err) { colorConsole.error(err); }
-                    res.should.have.status(400);
-                    done();
-                });
+            }, 1000);
         });
 
         it('should return 404', (done) => {
@@ -130,14 +99,15 @@ describe('PostService', async () => {
                 id: 'test id for status 404',
             };
 
-            chai.request(serverAddress)
-                .get(`/api/post/detail/`)
-                .send(params)
+            setTimeout(() => {         
+                chai.request(serverAddress)
+                .get('/api/post/detail/' + params.id)
                 .end((err, res) => {
                     if (err) { colorConsole.error(err); }
                     res.should.have.status(404);
                     done();
                 });
+            }, 1000);
         });
     });
 
