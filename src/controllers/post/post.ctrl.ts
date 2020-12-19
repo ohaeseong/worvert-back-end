@@ -63,7 +63,7 @@ export class PostCtrl {
   public getPostById = async (req: AuthRequest, res: Response) => {
     colorConsole.info('[GET] post detail data lookup api was called');
     const id: string  = req.params.id as string;
-
+    
     // id의 요청 방식이 올바른지 확인 하는 코드입니다.
     if (!id) {
       res.status(400).json({
@@ -190,7 +190,7 @@ export class PostCtrl {
       const { id, title, contents, thumbnailAddress } = body;
       
       const post = await this.postService.getPostForDiscrimination(id, decoded.memberId);
-
+      
       if(!post) {
         res.status(403).json({
           status: 403,

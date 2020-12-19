@@ -1,8 +1,12 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import config from '../../config';
+import { Repository } from 'typeorm';
 
+import config from '../../config';
+import { Post } from '../database/models/Post';
 import * as colorConsole from '../lib/console';
+import connectDatabase from '../database/connection';
+import { after, before } from 'mocha';
 
 chai.use(chaiHttp);
 
@@ -10,12 +14,48 @@ const serverAddress = config.replace;
 const should = chai.should();
 const testToken = config.testToken;
 
+const postFormData = {
+    id: 'test',
+    title: 'test title',
+    contents: 'test contents',
+    category: 'test category',
+    thumbnailAddress :'',
+    series: 'test series',
+    writer: 'test',
+  } as any;
+
 // test code for post api
-describe('PostService', () => {
-    context("Read Post List", () => {
-        beforeEach((done) => {
-        
+describe('PostService', async () => {
+
+    before(async () => {
+        await connectDatabase();
+    });
+
+    after(() => {
+        Post.delete({
+            writer: 'test',
         });
+    });
+
+    context("Read Post List", () => {
+        // beforeEach(async ()  => {
+
+        //     Promise.all([]).then(async () => {
+        //         await Post.save({
+        //             ...postFormData,
+        //         });
+        //     });
+        // });
+
+        // afterEach(async () => {
+        //     await Promise.all([]).then(() => {
+        //         Post.delete({
+        //             id: 'test'
+        //         });
+        //     });
+        // });
+
+
         it('should return 200 status code', (done) => {
             const params = {
                 page: 0,
@@ -40,18 +80,31 @@ describe('PostService', () => {
                 .end((err, res) => {
                     res.should.have.status(400);
                     done();
-                });
+                }); 
         });
+
     });
 
     context('Read Post Detail Data', () => {
+        
+        before(()  => {
+            Post.save({
+                ...postFormData,
+            });
+        });
+
+        after(() => {
+            Post.delete({
+                id: 'test'
+            });
+        });
+
         it('should return 200', (done) => {
-            const params = {
-                id: '4b1c41e284225536a06a62d10315d9c6',
-            };
+            const params = { id: 'test', };
 
             chai.request(serverAddress)
-                .get(`/api/post/detail/:id=${params.id}`)
+                .get(`/api/post/detail/:id`)
+                .send(params)
                 .end((err, res) => {
                     if (err) { colorConsole.error(err); }
                     res.should.have.status(200);
@@ -60,12 +113,11 @@ describe('PostService', () => {
         });
 
         it('should return 400', (done) => {
-            const params = {
-                // id: '4b1c41e284225536a06a62d10315d9c6',
-            };
+            const params = { id: 'test12' };
 
             chai.request(serverAddress)
-                .get(`/api/post/detail/:id=${''}`)
+                .get(`/api/post/detail/`)
+                .send(params)
                 .end((err, res) => {
                     if (err) { colorConsole.error(err); }
                     res.should.have.status(400);
@@ -79,7 +131,8 @@ describe('PostService', () => {
             };
 
             chai.request(serverAddress)
-                .get(`/api/post/detail/:id=${'test id for status 404'}`)
+                .get(`/api/post/detail/`)
+                .send(params)
                 .end((err, res) => {
                     if (err) { colorConsole.error(err); }
                     res.should.have.status(404);
@@ -125,15 +178,29 @@ describe('PostService', () => {
     });
 
     context('Update post api', () => {
-        it('should return 200', (done) => {
+
+        beforeEach(async ()  => {
+            await Post.save({
+                ...postFormData,
+            });
+        });
+
+        afterEach(async () => {
+            await Post.delete({
+                id: 'test',
+            });
+        });
+
+        it('should return 200 wait 1s for asynchronous', (done) => {
             const body = {
-                id: '4d81b14f4f85bd7ebec0d50adcd05497',
+                id: 'test',
                 title: 'test post update',
                 contents: 'test post update',
                 thumbnailAddress: '',
             };
 
-            chai.request(serverAddress)
+            setTimeout(() => {
+                chai.request(serverAddress)
                 .put('/api/post')
                 .set('token', testToken)
                 .send(body)
@@ -142,6 +209,7 @@ describe('PostService', () => {
                     res.should.have.status(200);
                     done();
                 });
+            }, 1000);
         });
 
         it('should return 400', (done) => {
@@ -160,7 +228,7 @@ describe('PostService', () => {
 
         it('should return 403', (done) => {
             const body = {
-                id: '4d81b14f4f85bd7ebec0d50adcd054971',
+                id: 'test12',
                 title: 'test post update',
                 contents: 'test post update',
                 thumbnailAddress: '',
@@ -178,12 +246,62 @@ describe('PostService', () => {
         });
     });
 
-    // context('Delete post api', () => {
-    //     it('should return 200', (done) => {
-    //         const params = { id: '41fd0de7973483ee829d088415d65192' };
+    context('Delete post api wait 1s for asynchronous', () => {
+        beforeEach(()  => {
+             Post.save({
+                ...postFormData,
+            });
+        });
 
+        afterEach(() => {
+            Post.delete({
+                id: 'test',
+            });
+        });
 
-    //     });
-    // });
+        it('should return 200', (done) => {
+            const params = { id: 'test' };
+
+            setTimeout(() => {
+                chai.request(serverAddress)
+                .delete('/api/post')
+                .set('token', testToken)
+                .query({id: params.id})
+                .end((err, res) => {
+                    if (err) { colorConsole.error(err) }
+                    res.should.have.status(200);
+                    done();
+                });
+            }, 1000);
+        });
+
+        it('should return 400', (done) => {
+            const params = { id: '' };
+
+            chai.request(serverAddress)
+                .delete('/api/post')
+                .set('token', testToken)
+                .query({id: params.id})
+                .end((err, res) => {
+                    if (err) { colorConsole.error(err) }
+                    res.should.have.status(400);
+                    done();
+                });
+        });
+
+        it('should return 403', (done) => {
+            const params = { id: 'not found' };
+
+            chai.request(serverAddress)
+                .delete('/api/post')
+                .set('token', testToken)
+                .query({id: params.id})
+                .end((err, res) => {
+                    if (err) { colorConsole.error(err) }
+                    res.should.have.status(403);
+                    done();
+                });
+        });
+    });
 
 });
