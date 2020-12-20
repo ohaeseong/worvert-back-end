@@ -3,14 +3,13 @@ import chaiHttp from 'chai-http';
 
 import config from '../../config';
 import { Post } from '../database/models/Post';
-import * as colorConsole from '../lib/console';
-import connectDatabase from '../database/connection';
 import { after, before } from 'mocha';
 
 chai.use(chaiHttp);
 
 const serverAddress = config.replace;
 const should = chai.should();
+const expect = chai.expect;
 const testToken = config.testToken;
 
 const postFormData = {
@@ -26,12 +25,8 @@ const postFormData = {
 // test code for post api
 describe('PostService', async () => {
 
-    before(async () => {
-        await connectDatabase();
-    });
-
-    after(() => {
-        Post.delete({
+    after(async () => {
+        await Post.delete({
             writer: 'test',
         });
     });
@@ -47,7 +42,10 @@ describe('PostService', async () => {
                 .get('/api/post')
                 .query(params)
                 .end((err, res) => {
-                    res.should.have.status(200);
+                    expect(res, err).to.have.status(200);
+                    expect(res.body['data']['posts'], `
+                        post list type is array but, it is not!
+                    `).to.have.be.a('array');
                     done();
                 });
         });
@@ -59,7 +57,7 @@ describe('PostService', async () => {
                 .get('/api/post')
                 .query(params)
                 .end((err, res) => {
-                    res.should.have.status(400);
+                    expect(res, err).to.have.status(400);
                     done();
                 }); 
         });
@@ -80,21 +78,23 @@ describe('PostService', async () => {
             });
         });
 
-        it('should return 200', (done) => {
+        it('should return 200  wait 1s for asynchronous', (done) => {
             const params = { id: 'test' };
 
             setTimeout(() => {
                 chai.request(serverAddress)
                 .get('/api/post/detail/' + params.id)
                 .end((err, res) => {
-                    if (err) { colorConsole.error(err); }
-                    res.should.have.status(200);
+                    expect(res, err).to.have.status(200);
+                    expect(res.body['data']['post'], `
+                        post detail type is object but, it is not!
+                    `).to.should.have.be.a('object');
                     done();
                 });
             }, 1000);
         });
 
-        it('should return 404', (done) => {
+        it('should return 404  wait 1s for asynchronous', (done) => {
             const params = {
                 id: 'test id for status 404',
             };
@@ -103,8 +103,7 @@ describe('PostService', async () => {
                 chai.request(serverAddress)
                 .get('/api/post/detail/' + params.id)
                 .end((err, res) => {
-                    if (err) { colorConsole.error(err); }
-                    res.should.have.status(404);
+                    expect(res, err).to.have.status(404);
                     done();
                 });
             }, 1000);
@@ -126,8 +125,7 @@ describe('PostService', async () => {
                 .set('token', testToken)
                 .send(body)
                 .end((err, res) => {
-                    if (err) { colorConsole.error(err); }
-                    res.should.have.status(200);
+                    expect(res, err).to.have.status(200);
                     done();
                 });
         });
@@ -140,8 +138,7 @@ describe('PostService', async () => {
                 .set('token', testToken)
                 .send(body)
                 .end((err, res) => {
-                    if (err) { colorConsole.error(err); }
-                    res.should.have.status(400);
+                    expect(res, err).to.have.status(400);
                     done();
                 });
         });
@@ -175,8 +172,7 @@ describe('PostService', async () => {
                 .set('token', testToken)
                 .send(body)
                 .end((err, res) => {
-                    if (err) { colorConsole.error(err) }
-                    res.should.have.status(200);
+                    expect(res, err).to.have.status(200);
                     done();
                 });
             }, 1000);
@@ -190,8 +186,7 @@ describe('PostService', async () => {
                 .set('token', testToken)
                 .send(body)
                 .end((err, res) => {
-                    if (err) { colorConsole.error(err) }
-                    res.should.have.status(400);
+                    expect(res, err).to.have.status(400);
                     done();
                 });
         });
@@ -209,14 +204,13 @@ describe('PostService', async () => {
                 .set('token', testToken)
                 .send(body)
                 .end((err, res) => {
-                    if (err) { colorConsole.error(err) }
-                    res.should.have.status(403);
+                    expect(res, err).to.have.status(403);
                     done();
                 });
         });
     });
 
-    context('Delete post api wait 1s for asynchronous', () => {
+    context('Delete post api', () => {
         beforeEach(()  => {
              Post.save({
                 ...postFormData,
@@ -229,7 +223,7 @@ describe('PostService', async () => {
             });
         });
 
-        it('should return 200', (done) => {
+        it('should return 200 wait 1s for asynchronous', (done) => {
             const params = { id: 'test' };
 
             setTimeout(() => {
@@ -238,8 +232,7 @@ describe('PostService', async () => {
                 .set('token', testToken)
                 .query({id: params.id})
                 .end((err, res) => {
-                    if (err) { colorConsole.error(err) }
-                    res.should.have.status(200);
+                    expect(res, err).to.have.status(200);
                     done();
                 });
             }, 1000);
@@ -253,8 +246,7 @@ describe('PostService', async () => {
                 .set('token', testToken)
                 .query({id: params.id})
                 .end((err, res) => {
-                    if (err) { colorConsole.error(err) }
-                    res.should.have.status(400);
+                    expect(res, err).to.have.status(400);
                     done();
                 });
         });
@@ -267,8 +259,7 @@ describe('PostService', async () => {
                 .set('token', testToken)
                 .query({id: params.id})
                 .end((err, res) => {
-                    if (err) { colorConsole.error(err) }
-                    res.should.have.status(403);
+                    expect(res, err).to.have.status(403);
                     done();
                 });
         });
