@@ -1,10 +1,15 @@
 import { Response } from 'express';
 import { Service } from "typedi";
+import axios from 'axios';
+import dotenv from 'dotenv';
+
 import { AuthService } from "../../services/auth.service";
 import { AuthRequest } from "../../typings";
 import * as Validate from '../../lib/validate/auth.validate';
 import * as tokenLib from '../../lib/token.lib';
 import * as colorConsole from '../../lib/console';
+
+dotenv.config();
 
 @Service()
 export class AuthCtrl {
@@ -66,4 +71,85 @@ export class AuthCtrl {
       });
     }
   };
+
+  public loginWithGithub = async (req: AuthRequest, res: Response) => {
+    colorConsole.info('[POST] github login api was called');
+    const { code } = req.body;
+
+    if (!code) {
+      res.status(400).json({
+        status: 400,
+        message: '요청 오류!',
+      });
+
+      return;
+    }
+
+    try {
+      const response = await axios.post('https://github.com/login/oauth/access_token', {
+        code,
+        client_id: process.env.GIT_HUB_CLIENT_ID,
+        client_secret: process.env.GIT_HUB_CLIENT_SECRET,
+      }, {
+        headers: {
+          accept: 'application/json',
+        },
+      });
+
+      const gihubToken = response.data.access_token;
+
+      const { data } = await axios.get('https://api.github.com/user', {
+        headers: {
+          Authorization: `token ${gihubToken}`,
+        },
+      });
+
+      const { login, id } = data;
+
+      const token = await tokenLib.createToken(id, 1);
+      
+      res.status(200).json({
+        status: 200,
+        message: '깃헙 로그인 성공!',
+        data: {
+          token,
+        },
+      });
+        
+    } catch (error) {
+      colorConsole.error(error);
+
+      res.status(500).json({
+        status: 500,
+        message: '서버 에러',
+      });
+    }
+  };
+
+  public registerAccount = async (req: AuthRequest, res: Response) => {
+    const { body } = req;
+
+    try {
+
+    } catch (error) {
+      res.status(400).json({
+        status: 400,
+        message: '요청 오류!',
+      });
+
+      return;
+    }
+
+    try {
+
+    } catch (error) {
+      colorConsole.error(error);
+
+      res.status(500).json({
+        status: 500,
+        message: '서버 에러',
+      });
+    }
+  };
+
 }
