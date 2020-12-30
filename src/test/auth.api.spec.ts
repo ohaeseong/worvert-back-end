@@ -5,6 +5,7 @@ import config from '../../config';
 import { Member } from '../database/models/Member';
 import connectDatabase from '../database/connection';
 import { after, before } from 'mocha';
+import { Post } from '../database/models/Post';
 
 chai.use(chaiHttp);
 
@@ -17,12 +18,6 @@ describe('MemberService Test', async () => {
         await connectDatabase();
     });
 
-    after(async () => {
-        await Member.delete({
-            member_id: 'test',
-        });
-    });
-
     context('Login test account', () => {
 
         beforeEach(() => {
@@ -30,6 +25,7 @@ describe('MemberService Test', async () => {
                 member_id: 'test',
                 pw: 'test1234',
                 access_level: 0,
+                member_name: 'test',
                 profile_image: ''
             } as any;
 

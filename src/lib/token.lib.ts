@@ -10,7 +10,7 @@ export const createToken = (memberId: string, accessLevel: number) => {
     accessLevel,
   };
 
-  const option = { expiresIn: '5 days', issuer: 'tech-diary.com', subject: 'token' };
+  const option = { issuer: 'tech-diary.com', subject: 'token' };
 
   try {
     return jwt.sign(payload, jwtSecret, option);

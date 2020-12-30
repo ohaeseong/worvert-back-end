@@ -111,10 +111,10 @@ export class CommentCtrl {
         }
 
         try {
-            const { idx, commentTxt } = body;
+            const { commentIdx, commentTxt } = body;
             const { memberId } = decoded;
 
-            const comment = await this.commentService.getCommentForDiscrimination(idx, memberId);
+            const comment = await this.commentService.getCommentForDiscrimination(commentIdx, memberId);
 
             if (!comment) {
                 res.status(403).json({
@@ -125,7 +125,7 @@ export class CommentCtrl {
                 return;
             }
 
-            await this.commentService.updatePostComment(idx, commentTxt);
+            await this.commentService.updatePostComment(commentIdx, commentTxt);
 
             res.status(200).json({
                 status:200,
@@ -147,10 +147,10 @@ export class CommentCtrl {
         const commentIdx = req.query.commentIdx as string;
         const { decoded } = req;
 
-        if (!commentIdx || parseInt(commentIdx) < 0) {
+        if (!commentIdx) {
             res.status(400).json({
                 status: 400,
-                message: 'comment idx is not to be minus number! or you\'re not input the idx!',
+                message: 'you\'re not input the idx!',
             });
 
             return;

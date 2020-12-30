@@ -11,7 +11,7 @@ export class CommentRoute {
     private router: Router;
 
     constructor(
-        // public 
+        public commentCtrl: CommentCtrl,
     ) {
         // Router 함수 값 선언
         this.router = Router();
@@ -21,10 +21,10 @@ export class CommentRoute {
     }
 
     private setRouter() {
-        this.router.post('/',authMiddleWare, Container.get(CommentCtrl).createComment);
-        this.router.get('/', Container.get(CommentCtrl).getComments);
-        this.router.put('/', authMiddleWare, Container.get(CommentCtrl).updateComment);
-        this.router.delete('/', authMiddleWare, Container.get(CommentCtrl).deleteComment);
+        this.router.post('/',authMiddleWare, this.commentCtrl.createComment);
+        this.router.get('/', this.commentCtrl.getComments);
+        this.router.put('/', authMiddleWare, this.commentCtrl.updateComment);
+        this.router.delete('/', authMiddleWare, this.commentCtrl.deleteComment);
     }
 
     public getRouter() {

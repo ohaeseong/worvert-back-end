@@ -3,7 +3,7 @@ import chaiHttp from 'chai-http';
 
 import config from '../../config';
 import { Post } from '../database/models/Post';
-import { after, before } from 'mocha';
+import { after } from 'mocha';
 
 chai.use(chaiHttp);
 
@@ -11,6 +11,7 @@ const serverAddress = config.replace;
 const should = chai.should();
 const expect = chai.expect;
 const testToken = config.testToken;
+const testToken2 = config.testToken2;
 
 const postFormData = {
     id: 'test',
@@ -31,7 +32,7 @@ describe('PostService', async () => {
         });
     });
 
-    context("Read Post List", () => {
+    context('Read Post List', () => {
         it('should return 200 status code', (done) => {
             const params = {
                 page: 0,
@@ -66,13 +67,13 @@ describe('PostService', async () => {
 
     context('Read Post Detail Data', () => {
         
-        before(()  => {
+        beforeEach(()  => {
             Post.save({
                 ...postFormData,
             });  
         });
 
-        after(() => {
+        afterEach(() => {
             Post.delete({
                 id: 'test'
             });
@@ -99,14 +100,13 @@ describe('PostService', async () => {
                 id: 'test id for status 404',
             };
 
-            setTimeout(() => {         
-                chai.request(serverAddress)
-                .get('/api/post/detail/' + params.id)
-                .end((err, res) => {
-                    expect(res, err).to.have.status(404);
-                    done();
-                });
-            }, 1000);
+       
+            chai.request(serverAddress)
+            .get('/api/post/detail/' + params.id)
+            .end((err, res) => {
+                expect(res, err).to.have.status(404);
+                done();
+            });
         });
     });
 
@@ -146,14 +146,14 @@ describe('PostService', async () => {
 
     context('Update post api', () => {
 
-        beforeEach(async ()  => {
-            await Post.save({
+        beforeEach(()  => {
+            Post.save({
                 ...postFormData,
             });
         });
 
-        afterEach(async () => {
-            await Post.delete({
+        afterEach(() => {
+            Post.delete({
                 id: 'test',
             });
         });
@@ -193,7 +193,7 @@ describe('PostService', async () => {
 
         it('should return 403', (done) => {
             const body = {
-                id: 'test12',
+                id: 'test',
                 title: 'test post update',
                 contents: 'test post update',
                 thumbnailAddress: '',
@@ -201,7 +201,7 @@ describe('PostService', async () => {
 
             chai.request(serverAddress)
                 .put('/api/post')
-                .set('token', testToken)
+                .set('token', testToken2)
                 .send(body)
                 .end((err, res) => {
                     expect(res, err).to.have.status(403);
@@ -252,11 +252,11 @@ describe('PostService', async () => {
         });
 
         it('should return 403', (done) => {
-            const params = { id: 'not found' };
+            const params = { id: 'test' };
 
             chai.request(serverAddress)
                 .delete('/api/post')
-                .set('token', testToken)
+                .set('token', testToken2)
                 .query({id: params.id})
                 .end((err, res) => {
                     expect(res, err).to.have.status(403);

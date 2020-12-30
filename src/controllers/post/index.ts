@@ -1,8 +1,9 @@
-import express, { Router, Express } from 'express';
+import { Router } from 'express';
 import Container, { Service } from 'typedi';
 import { PostCtrl } from './post.ctrl';
 import authMiddleWare from '../../middlewares/auth.middleware';
 import { CommentRoute } from './comment';
+import { LikeRoute } from './like';
 
 // dependency injection type di
 @Service()
@@ -31,6 +32,7 @@ export class PostRoute {
 
     // comment api route setting
     this.router.use('/comment', Container.get(CommentRoute).getRouter());
+    this.router.use('/like', Container.get(LikeRoute).getRouter());
   }
 
   // postRouter 값 리턴 함수 (외부에서 router  접근이 가능 하도록 만든 함수)
