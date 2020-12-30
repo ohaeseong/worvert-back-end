@@ -1,0 +1,93 @@
+import chai from 'chai';
+import chaiHttp from 'chai-http';
+
+import config from '../../config';
+import { Member } from '../database/models/Member';
+import connectDatabase from '../database/connection';
+import { after, before } from 'mocha';
+import { Post } from '../database/models/Post';
+
+chai.use(chaiHttp);
+
+const serverAddress = config.replace;
+const should = chai.should();
+const expect = chai.expect;
+
+describe('MemberService Test', async () => {
+    before(async () => {
+        await connectDatabase();
+    });
+
+    context('Login test account', () => {
+
+        beforeEach(() => {
+            const MemberFormData = {
+                member_id: 'test',
+                pw: 'test1234',
+                access_level: 0,
+                member_name: 'test',
+                profile_image: ''
+            } as any;
+
+            Member.save({
+                ...MemberFormData,
+            });
+        });
+
+        afterEach(() => {
+            Member.delete({
+                member_id: 'test',
+            });
+        });
+
+        it('should return 200 and token string', (done) => {
+            const body = {
+                memberId: 'test',
+                pw: 'test1234'
+            };
+
+            setTimeout(() => {
+                chai.request(serverAddress)
+                .post('/api/auth/login')
+                .send(body)
+                .end((err, res) => {
+                    expect(res, err).to.have.status(200);
+                    expect(res.body['data']['token'], `
+                        user login token type is not string!
+                    `).to.should.have.be.string;
+                    done();
+                });
+            }, 1000);
+        });
+
+        it('should return 400', (done) => {
+            const body = {
+                memberId: '',
+                pw: ''
+            };
+
+            chai.request(serverAddress)
+            .post('/api/auth/login')
+            .send(body)
+            .end((err, res) => {
+                expect(res, err).to.have.status(400);
+                done();
+            });
+        });
+
+        it('should return 404', (done) => {
+            const body = {
+                memberId: 'test 404',
+                pw: 'fail pw'
+            };
+
+            chai.request(serverAddress)
+            .post('/api/auth/login')
+            .send(body)
+            .end((err, res) => {
+                expect(res, err).to.have.status(404);
+                done();
+            });
+        });
+    });
+});

@@ -22,4 +22,14 @@ export class AuthService {
 
     return member;
   };
+
+  public async findUserById(memberId: string) {
+    const member = await this.memberRepo.findOne({
+      where: {
+        member_id: memberId,
+      },
+    });
+
+    return member;
+  };
 }

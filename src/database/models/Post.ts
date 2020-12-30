@@ -1,4 +1,6 @@
-import { Entity, BaseEntity, Column, PrimaryColumn } from 'typeorm';
+import { Entity, BaseEntity, Column, PrimaryColumn, OneToMany } from 'typeorm';
+import { Comment } from './Comment';
+import { Like } from './Like';
 
 // 게시글 모델 구성
 @Entity()
@@ -29,4 +31,16 @@ export class Post extends BaseEntity {
 
   @Column({ type: 'timestamp', nullable: true})
   update_time: string;
+
+  @OneToMany(
+    (type) => Comment,
+    (comment) => comment.post_id,
+  )
+  comments!: Comment[];
+
+  @OneToMany(
+    (type) => Like,
+    (like) => like.post_id,
+  )
+  likes!: Like[];
 }
