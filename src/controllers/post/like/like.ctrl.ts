@@ -13,12 +13,10 @@ export class LikeCtrl {
         private postService: PostService,
     ) { }
 
-    public async addLikeOrCancelLike(req: AuthRequest, res: Response) {
+    public addLikeOrCancelLike = async (req: AuthRequest, res: Response) => {
         colorConsole.info('[POST] add or cancel like to post');
         const { postId } = req.body;
         const { memberId } = req.decoded;
-        console.log(this.postService);
-        
 
         if (!postId) {
             res.status(400).json({
@@ -30,6 +28,7 @@ export class LikeCtrl {
         }
 
         try {
+
             const post = await this.postService.getPostById(postId);
             if (!post) {
                 res.status(404).json({

@@ -3,7 +3,7 @@ import { Response } from 'express';
 import { PostService } from '../../services/post.service';
 import { AuthRequest, PostDetail, PostWriteForm } from '../../typings'; 
 import * as Validate  from '../../lib/validate/post.validate';
-import { generatedId } from '../../lib/method.lib';
+import { asyncForeach, generatedId } from '../../lib/method.lib';
 import * as colorConsole from '../../lib/console';
 import config from '../../../config';
 import { PostCommentService } from '../../services/post.comment.service';
@@ -24,7 +24,7 @@ export class PostCtrl {
     const category: string  = req.query.category as string;
 
     // limit, page의 요청 방식이 올바른지 확인 하는 코드입니다.
-    if (!page || parseInt(page) < 0) {
+    if (!page || parseInt(page) < 0 || !category) {
           res.status(400).json({
             status: 400,
             message: '양식이 맞지 않아요!'
@@ -41,6 +41,12 @@ export class PostCtrl {
       const allPosts = await this.postService.getAllPostDataByCategory(category); 
       
       const totalPage = Math.ceil(allPosts.length / limit);
+
+      await asyncForeach(posts, async (post: PostDetail) => {
+        const commentData = await this.commentService.getPostCommentListAll(post.id);
+        console.log(commentData);
+        
+      });
 
       res.status(200).json({
         status: 200,
@@ -65,15 +71,15 @@ export class PostCtrl {
     const id: string  = req.params.id as string;
     // console.log(id);
     
-    // // id의 요청 방식이 올바른지 확인 하는 코드입니다.
-    // if (!id) {
-    //   res.status(400).json({
-    //     status: 400,
-    //     message: '양식이 맞지 않아요!'
-    //   });
+    // id의 요청 방식이 올바른지 확인 하는 코드입니다.
+    if (!id) {
+      res.status(400).json({
+        status: 400,
+        message: '양식이 맞지 않아요!'
+      });
 
-    //   return
-    // }
+      return
+    }
 
     try {
 
@@ -89,7 +95,7 @@ export class PostCtrl {
         return;
       }
 
-      const commentData = await this.commentService.getPostCommentList(5);
+      const commentData = await this.commentService.getPostCommentList(5, post.id);
 
       post.commentList = {
         commentData,
@@ -149,7 +155,7 @@ export class PostCtrl {
         category,
         thumbnailAddress,
         series,
-        writer: memberId,
+        memberId,
       } as PostWriteForm;
 
       // DB에 저장하는 함수를 실행합니다.

@@ -19,6 +19,7 @@ export class CommentCtrl {
     public getComments = async (req: AuthRequest, res: Response) => {
         colorConsole.info('[GET] comments list lookup api was called');
         const limit = req.query.limit as string;
+        const postId = req.query.postId as string;
 
         if (!limit || parseInt(limit) < 0) {
             res.status(400).json({
@@ -30,7 +31,7 @@ export class CommentCtrl {
         }
 
         try {
-            const commentData = await this.commentService.getPostCommentList(parseInt(limit));
+            const commentData = await this.commentService.getPostCommentList(parseInt(limit), postId);
             
             res.status(200).json({
                 status: 200,
@@ -108,6 +109,8 @@ export class CommentCtrl {
                 status: 400,
                 message: 'comment update body form is wrong! try again',
             });
+
+            return;
         }
 
         try {

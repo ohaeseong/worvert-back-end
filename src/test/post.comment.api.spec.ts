@@ -20,32 +20,21 @@ const postFormData = {
     category: 'test category',
     thumbnailAddress :'',
     series: 'test series',
-    writer: 'test',
+    memberId: 'test',
   } as any;
 
 const commentData = {
     idx: -1,
-    member_id: 'test',
-    post_id: 'test',
-    comment_txt: 'test',
-    create_date: '2020-12-01',
+    memberId: 'test',
+    postId: 'test',
+    commentDate: 'test',
+    createDate: '2020-12-01',
 } as any;
 
 describe('PostCommentService', async () => {
     before(() => {
         Post.save({
             ...postFormData,
-        });
-    });
-
-    after(() => {
-        Comment.delete({
-            post_id: 'test',
-            member_id: 'test',
-        });
-
-        Post.delete({
-            writer: 'test',
         });
     });
 
@@ -216,21 +205,6 @@ describe('PostCommentService', async () => {
             .set('token', testToken2)
             .end((err, res) => {
                 expect(res, err).to.have.status(403);
-                done();
-            });
-        });
-
-        it('should return 404 status code', (done) => {
-            const params = {
-                commentIdx: '-2',
-            };
-
-            chai.request(serverAddress)
-            .delete('/api/post/comment')
-            .query(params)
-            .set('token', testToken)
-            .end((err, res) => {
-                expect(res, err).to.have.status(404);
                 done();
             });
         });

@@ -15,7 +15,7 @@ export class AuthService {
   public async login(memberId: string, pw: string) {
     const member = await this.memberRepo.findOne({
       where: {
-        member_id: memberId,
+        memberId,
         pw,
       },
     });
@@ -26,7 +26,7 @@ export class AuthService {
   public async findUserById(memberId: string) {
     const member = await this.memberRepo.findOne({
       where: {
-        member_id: memberId,
+        memberId,
       },
     });
 

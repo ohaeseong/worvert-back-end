@@ -1,20 +1,27 @@
-import { Entity, BaseEntity, PrimaryColumn, Column } from "typeorm";
+import { Entity, BaseEntity, PrimaryColumn, Column, OneToMany } from "typeorm";
+import { Post } from "./Post";
 
 // 사용자, 멤버 모델
 @Entity()
 export class Member extends BaseEntity {
   @PrimaryColumn({ type: 'varchar', length: 50, unique: true })
-  member_id: string;
+  memberId: string;
 
-  @PrimaryColumn({ type: 'varchar', length: 50 })
-  member_name: string;
+  @Column({ type: 'varchar', length: 50 })
+  memberName: string;
 
   @Column({ type: 'varchar', length: 1000 })
   pw: string;
 
   @Column({ type: 'int' })
-  access_level: number;
+  accessLevel: number;
 
   @Column({ type: 'text', nullable: true })
-  profile_image: string;
+  profileImage: string;
+
+  @OneToMany(
+    (type) => Post,
+    (post) => post.memberId,
+  )
+  posts: Post[];
 }

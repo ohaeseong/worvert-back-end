@@ -22,11 +22,11 @@ describe('MemberService Test', async () => {
 
         beforeEach(() => {
             const MemberFormData = {
-                member_id: 'test',
+                memberId: 'test',
                 pw: 'test1234',
-                access_level: 0,
-                member_name: 'test',
-                profile_image: ''
+                accessLevel: 0,
+                memberName: 'test',
+                profileImage: ''
             } as any;
 
             Member.save({
@@ -36,7 +36,7 @@ describe('MemberService Test', async () => {
 
         afterEach(() => {
             Member.delete({
-                member_id: 'test',
+                memberId: 'test',
             });
         });
 

@@ -9,3 +9,9 @@ export const generatedId = () => {
 
   return id;
 };
+
+export const asyncForeach = (array: any[], callback: any) => {
+  array.forEach(async (element) => {
+    await callback(element);
+  });
+};
