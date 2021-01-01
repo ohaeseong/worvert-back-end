@@ -17,8 +17,8 @@ export class PostLikeService {
     public async addLikeByPostId(postId: string, memberId: string) {
 
         const likeData = await this.likeRepo.save({
-            post_id: postId,
-            member_id: memberId,
+            postId,
+            memberId,
         });
 
         return likeData;
@@ -27,8 +27,8 @@ export class PostLikeService {
     public async cancelLikeByPostId(postId: string, memberId: string) {
 
         const likeData = await this.likeRepo.delete({
-            post_id: postId,
-            member_id: memberId,
+            // postId,
+            memberId,
         });
 
         return likeData;
@@ -36,8 +36,8 @@ export class PostLikeService {
 
     public async findLikeWithPostIdAndMemberId(postId: string, memberId: string) {
         const likeData = await this.likeRepo.findOne({
-                post_id: postId,
-                member_id: memberId,
+                // postId,
+                memberId,
             });
 
         return likeData;

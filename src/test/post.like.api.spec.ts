@@ -21,15 +21,15 @@ const postFormData = {
     category: 'test category',
     thumbnailAddress :'',
     series: 'test series',
-    writer: 'test',
+    memberId: 'test',
   } as any;
 
 describe('Like', async () => {
-    after(async () => {
-        await Post.delete({
-            writer: 'test',
-        });
-    });
+    // after(async () => {
+    //     await Post.delete({
+    //         memberId: 'test',
+    //     });
+    // });
 
     context('Add Post Like and if has like on post alreay, cancel like', () => {
         beforeEach(() => {

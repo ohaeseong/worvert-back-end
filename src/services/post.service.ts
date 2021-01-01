@@ -21,7 +21,7 @@ export class PostService {
         category,
       },
       order: {
-        create_time: "DESC"
+        createTime: "DESC"
       },
       skip: page * limit,
       take: limit,
@@ -53,11 +53,11 @@ export class PostService {
   }
 
   // 게시글 작성자 식별을 위한 함수
-  public async getPostForDiscrimination(id: string, writer: string) {
+  public async getPostForDiscrimination(id: string, memberId: string) {
     const result = await this.postRepo.findOne({
       where: {
         id,
-        writer
+        memberId
       }
     });
 
@@ -74,13 +74,13 @@ export class PostService {
   }
 
   // 게시글 수정
-  public async updatePostByIdx(id: string, title: string, contents: string, thumbnail_address?: string) {
+  public async updatePostByIdx(id: string, title: string, contents: string, thumbnailAddress?: string) {
     const result =  await this.postRepo.update({
       id,
     }, {
       title,
       contents,
-      thumbnail_address,
+      thumbnailAddress,
     });
 
     return result;

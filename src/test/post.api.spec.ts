@@ -20,17 +20,11 @@ const postFormData = {
     category: 'test category',
     thumbnailAddress :'',
     series: 'test series',
-    writer: 'test',
+    memberId: 'test',
   } as any;
 
 // test code for post api
 describe('PostService', async () => {
-
-    after(async () => {
-        await Post.delete({
-            writer: 'test',
-        });
-    });
 
     context('Read Post List', () => {
         it('should return 200 status code', (done) => {

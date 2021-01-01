@@ -12,22 +12,38 @@ export class PostCommentService {
 
     // 게시글 작성 함수
     public async createPostComment(commentTxt: string, memberId: string, postId: string) {
+
         const commentData = await this.commentRepo.save({
-            comment_txt: commentTxt,
-            member_id: memberId,
-            post_id: postId,
+            postId,
+            commentTxt,
+            memberId,
         });
 
         return commentData;
     }
 
     // 게시글 댓글 목록 조회 조회 방식은 load more형식이므로 skip이 필요 없다.
-    public async getPostCommentList(limit: number) {
+    public async getPostCommentList(limit: number, postId: string) {
         const commentData = await this.commentRepo.find({
+            where: {
+                postId,
+            },
             order: {
-                create_date: "DESC",
+                createDate: "DESC",
             },
             take: limit,
+        });
+
+        return commentData;
+    }
+
+    public async getPostCommentListAll(postId: string) {
+        const commentData = await this.commentRepo.find({
+            where: {
+                postId,
+            },
+
+            relations:['id','postId']
         });
 
         return commentData;
@@ -38,7 +54,7 @@ export class PostCommentService {
         const commentData = await this.commentRepo.update({
             idx,
         }, {
-            comment_txt: commentTxt,
+            commentTxt,
         });
 
         return commentData;
@@ -57,7 +73,7 @@ export class PostCommentService {
     public async getCommentForDiscrimination(idx: number, memberId: string) {
         const commentData = await this.commentRepo.findOne({
             idx,
-            member_id: memberId,
+            memberId,
         });
 
         return commentData;

@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, Generated, ManyToOne, PrimaryColumn } from "typeorm";
+import { BaseEntity, Column, Entity, Generated, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { Post } from "./Post";
 
 @Entity()
@@ -8,21 +8,22 @@ export class Comment extends BaseEntity {
     idx: number;
 
     @Column({ type: 'varchar', length: 1000 })
-    comment_txt: string;
+    commentTxt: string;
+
 
     @Column({ type: 'varchar', length: 50 })
-    member_id: string;
+    memberId: string;
 
-    @Column({ type: 'varchar' })
-    post_id: string;
+    @Column({ type: 'varchar', length: 100 })
+    postId: string;
 
     @Column({ type: 'timestamp', default: () => "CURRENT_TIMESTAMP" })
-    create_date: string;
+    createDate: string;
 
 
     @ManyToOne(
         (type) => Post,
-        (post) => post.id,
+        (post) => post.id, { nullable: false, onDelete: 'CASCADE' },
     )
-    post!: Post;
+    post: Post;
 }

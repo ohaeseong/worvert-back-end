@@ -7,11 +7,8 @@ export class Like extends BaseEntity {
     @Generated('increment')
     idx: number;
 
-    @Column({ type: 'varchar', length: 1000 })
-    post_id: string;
-
     @Column({ type: 'varchar', length: 50 })
-    member_id: string;
+    memberId: string;
 
     @ManyToOne(
         (type) => Post,

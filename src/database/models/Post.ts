@@ -15,7 +15,7 @@ export class Post extends BaseEntity {
   contents: string;
 
   @Column({ type: 'text', nullable: true })
-  thumbnail_address: string;
+  thumbnailAddress: string;
 
   @Column({ type: 'varchar', nullable: true })
   series: string;
@@ -24,23 +24,23 @@ export class Post extends BaseEntity {
   category: string;
 
   @Column({ type: 'varchar' })
-  writer: string;
+  memberId: string;
 
   @Column({ type: 'timestamp', default: () => "CURRENT_TIMESTAMP" })
-  create_time: string;
+  createTime: string;
 
   @Column({ type: 'timestamp', nullable: true})
-  update_time: string;
+  updateTime: string;
 
   @OneToMany(
     (type) => Comment,
-    (comment) => comment.post_id,
+    (comment) => comment.post, { nullable: false },
   )
   comments!: Comment[];
 
   @OneToMany(
     (type) => Like,
-    (like) => like.post_id,
+    (like) => like.post, { nullable: false },
   )
   likes!: Like[];
 }
