@@ -7,6 +7,7 @@ import { asyncForeach, generatedId } from '../../lib/method.lib';
 import * as colorConsole from '../../lib/console';
 import config from '../../../config';
 import { PostCommentService } from '../../services/post.comment.service';
+import { PostLikeService } from '../../services/post.like.service';
 
 const { replace } = config;
 
@@ -15,6 +16,7 @@ export class PostCtrl {
   constructor(
     private postService: PostService,
     private commentService: PostCommentService,
+    private likeService: PostLikeService,
   ) { }
   
   // 게시글 리스트 조회 함수
@@ -44,9 +46,12 @@ export class PostCtrl {
 
       await asyncForeach(posts, async (post: PostDetail) => {
         const commentData = await this.commentService.getPostCommentListAll(post.id);
-        console.log(commentData);
+        const likeData = await this.likeService.getAllLikeByPostId(post.id);
         
+        post.commentList = commentData.length;
+        post.like = likeData.length;
       });
+      
 
       res.status(200).json({
         status: 200,
@@ -96,10 +101,13 @@ export class PostCtrl {
       }
 
       const commentData = await this.commentService.getPostCommentList(5, post.id);
+      const likeData = await this.likeService.getAllLikeByPostId(post.id);
 
       post.commentList = {
         commentData,
       };
+
+      post.like = likeData.length;
 
       res.status(200).json({
         status: 200,

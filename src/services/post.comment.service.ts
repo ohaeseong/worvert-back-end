@@ -42,8 +42,6 @@ export class PostCommentService {
             where: {
                 postId,
             },
-
-            relations:['id','postId']
         });
 
         return commentData;
