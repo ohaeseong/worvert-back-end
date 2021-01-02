@@ -27,8 +27,17 @@ export class PostLikeService {
     public async cancelLikeByPostId(postId: string, memberId: string) {
 
         const likeData = await this.likeRepo.delete({
-            // postId,
+            postId,
             memberId,
+        });
+
+        return likeData;
+    }
+
+    public async getAllLikeByPostId(postId: string) {
+
+        const likeData = await this.likeRepo.find({
+            postId,
         });
 
         return likeData;
@@ -36,7 +45,7 @@ export class PostLikeService {
 
     public async findLikeWithPostIdAndMemberId(postId: string, memberId: string) {
         const likeData = await this.likeRepo.findOne({
-                // postId,
+                postId,
                 memberId,
             });
 

@@ -27,8 +27,7 @@ const commentData = {
     idx: -1,
     memberId: 'test',
     postId: 'test',
-    commentDate: 'test',
-    createDate: '2020-12-01',
+    commentTxt: 'test',
 } as any;
 
 describe('PostCommentService', async () => {
@@ -38,12 +37,18 @@ describe('PostCommentService', async () => {
         });
     });
 
+    after(async () => {
+        await Post.delete({
+            memberId: 'test',
+        });
+    });
+
     context('Write Post Comment', () => {
 
         it('should return 200 status code', (done) => {
             const body = {
                 postId: 'test',
-                commentTxt: 'test',
+                commentTxt: 'testadfasd',
             };
 
             setTimeout(() => {
@@ -143,6 +148,7 @@ describe('PostCommentService', async () => {
     });
 
     context('Delete Post Comment', () => {
+
         beforeEach(() => {
             Comment.save({
                 ...commentData,

@@ -26,6 +26,12 @@ const postFormData = {
 // test code for post api
 describe('PostService', async () => {
 
+    after(async () => {
+        await Post.delete({
+            memberId: 'test',
+        });
+    });
+
     context('Read Post List', () => {
         it('should return 200 status code', (done) => {
             const params = {

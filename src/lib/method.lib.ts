@@ -10,8 +10,8 @@ export const generatedId = () => {
   return id;
 };
 
-export const asyncForeach = (array: any[], callback: any) => {
-  array.forEach(async (element) => {
-    await callback(element);
-  });
+export const asyncForeach = async (array: any[], callback: any) => {
+  for (let i = 0; i < array.length; i++) {
+    await callback(array[i]);
+  }
 };
