@@ -15,15 +15,34 @@ export class PostService {
   ) { }
 
   // 게시글을 요청 받은 limit값과 page 별로 조회 한다.
-  public async getPostsByLimit(limit: number, page: number, category: string) {
+  public async getPostsByLimit(limit: number, page: number, category: string, kinds: string) {
+
+    // kins 종류별로 게시글 조회
+    if (!kinds) { 
+      const posts = await this.postRepo.find({
+        where: {
+          category,
+        },
+        order: {
+          createTime: "DESC"
+        },
+        skip: 0,
+        take: limit,
+      });
+
+      return posts;
+    }
+
+    // kinds all 조회
     const posts = await this.postRepo.find({
       where: {
         category,
+        kinds,
       },
       order: {
         createTime: "DESC"
       },
-      skip: page * limit,
+      skip: 0,
       take: limit,
     });
 
@@ -31,10 +50,23 @@ export class PostService {
   }
 
   // 게시글 카테고리 별 전체 조회
-  public async getAllPostDataByCategory(category: string) {
+  public async getAllPostDataByCategory(category: string, kinds: string) {
+
+    // all 조회
+    if (!kinds) {
+      const result = await this.postRepo.find({
+        where: {
+          category,
+        }
+      });
+  
+      return result;
+    }
+
     const result = await this.postRepo.find({
       where: {
         category,
+        kinds
       }
     });
 

@@ -7,6 +7,7 @@ export const writePostValidate = (body: Object) => {
       contents: Joi.string().required(),
       category: Joi.string().required(),
       series: Joi.string().allow(null).allow(''),
+      kinds: Joi.string().required(),
       thumbnailAddress: Joi.string().allow(null).allow(''),
     });
   

@@ -20,6 +20,7 @@ const postFormData = {
     category: 'test category',
     thumbnailAddress :'',
     series: 'test series',
+    kinds: 'front-end',
     memberId: 'test',
   } as any;
 
@@ -35,8 +36,28 @@ describe('PostService', async () => {
     context('Read Post List', () => {
         it('should return 200 status code', (done) => {
             const params = {
-                page: 0,
+                limit: 10,
                 category: 'test category',
+                kinds: '',
+            };
+
+            chai.request(serverAddress)
+                .get('/api/post')
+                .query(params)
+                .end((err, res) => {
+                    expect(res, err).to.have.status(200);
+                    expect(res.body['data']['posts'], `
+                        post list type is array but, it is not!
+                    `).to.have.be.a('array');
+                    done();
+                });
+        });
+
+        it('should return 200 status code', (done) => {
+            const params = {
+                limit: 10,
+                category: 'test category',
+                kinds: 'frond-end',
             };
 
             chai.request(serverAddress)
@@ -117,6 +138,7 @@ describe('PostService', async () => {
                 contents: 'this is test contents~',
                 category: 'TEST',
                 series: 'TEST series',
+                kinds: 'front-end',
                 thumbnailAddress: '',
             };
 
