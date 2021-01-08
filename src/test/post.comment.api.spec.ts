@@ -20,6 +20,7 @@ const postFormData = {
     category: 'test category',
     thumbnailAddress :'',
     series: 'test series',
+    kinds: 'front-end',
     memberId: 'test',
   } as any;
 

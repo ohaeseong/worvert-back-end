@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import config from '../../config';
 import { after, before } from 'mocha';
 import * as tokenLib from '../lib/token.lib';
+import { Member } from '../database/models/Member';
 
 chai.use(chaiHttp);
 
@@ -30,6 +31,10 @@ describe('Token Service Test', async () => {
     after(() => {
         refreshToken = '';
         refreshTokenUnauthorized = '';
+
+        Member.delete({
+            memberId: 'test',
+        });
     });
 
     context('reissued token with refresh token', () => {

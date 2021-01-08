@@ -1,6 +1,7 @@
-import { Entity, BaseEntity, Column, PrimaryColumn, OneToMany } from 'typeorm';
+import { Entity, BaseEntity, Column, PrimaryColumn, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
 import { Comment } from './Comment';
 import { Like } from './Like';
+import { Member } from './Member';
 
 // 게시글 모델 구성
 @Entity()
@@ -19,6 +20,9 @@ export class Post extends BaseEntity {
 
   @Column({ type: 'varchar', nullable: true })
   series: string;
+
+  @Column({ type: 'varchar', nullable: false })
+  kinds: string;
 
   @Column({ type: 'varchar' })
   category: string;
@@ -43,4 +47,13 @@ export class Post extends BaseEntity {
     (like) => like.post, { nullable: false },
   )
   likes!: Like[];
+
+  @ManyToOne(
+    (type) => Member,
+    (member) => member.memberId, { nullable: false },
+  )
+  @JoinColumn({
+    name: 'memberId'
+  })
+  member: Member;
 }

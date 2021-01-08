@@ -22,11 +22,12 @@ export class PostCtrl {
   // 게시글 리스트 조회 함수
   public getPosts = async (req: AuthRequest, res: Response) => {
     colorConsole.info('[GET] post list lookup api was called');
-    const page: string  = req.query.page as string;
     const category: string  = req.query.category as string;
+    const limit: string  = req.query.limit as string;
+    const kinds: string = req.query.kinds as string;
 
     // limit, page의 요청 방식이 올바른지 확인 하는 코드입니다.
-    if (!page || parseInt(page) < 0 || !category) {
+    if (!limit || parseInt(limit) < 0 || !category) {
           res.status(400).json({
             status: 400,
             message: '양식이 맞지 않아요!'
@@ -36,13 +37,13 @@ export class PostCtrl {
         }
 
     try {
-      const limit = 10;
-
-      // DB에 있는 데이터를 조회 합니다.
-      const posts = await this.postService.getPostsByLimit(limit, parseInt(page, 10), category);
-      const allPosts = await this.postService.getAllPostDataByCategory(category); 
       
-      const totalPage = Math.ceil(allPosts.length / limit);
+      
+      // DB에 있는 데이터를 조회 합니다.
+      const posts = await this.postService.getPostsByLimit(parseInt(limit, 10), 0, category, kinds);
+      const allPosts = await this.postService.getAllPostDataByCategory(category, kinds); 
+      
+      const totalPage = Math.ceil(allPosts.length / parseInt(limit, 10));
 
       await asyncForeach(posts, async (post: PostDetail) => {
         const commentData = await this.commentService.getPostCommentListAll(post.id);
@@ -50,6 +51,9 @@ export class PostCtrl {
         
         post.commentList = commentData.length;
         post.like = likeData.length;
+
+        delete post.member.pw;
+        delete post.member.accessLevel;
       });
       
 
@@ -74,7 +78,6 @@ export class PostCtrl {
   public getPostById = async (req: AuthRequest, res: Response) => {
     colorConsole.info('[GET] post detail data lookup api was called');
     const id: string  = req.params.id as string;
-    // console.log(id);
     
     // id의 요청 방식이 올바른지 확인 하는 코드입니다.
     if (!id) {
@@ -146,15 +149,11 @@ export class PostCtrl {
 
     try {
       const { memberId } = decoded;
-      const { title, contents, category, series } = body;
+      const { title, contents, category, series, kinds } = body;
       let { thumbnailAddress } = body;
       
 
       const id: string = await generatedId();
-
-      if (!thumbnailAddress) {
-        thumbnailAddress = `https://${replace}/static/img/thumbnail_default.png`;
-      }
       
       const postFormData = {
         id,
@@ -163,6 +162,7 @@ export class PostCtrl {
         category,
         thumbnailAddress,
         series,
+        kinds,
         memberId,
       } as PostWriteForm;
 
