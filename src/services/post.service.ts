@@ -20,6 +20,7 @@ export class PostService {
     // kins 종류별로 게시글 조회
     if (!kinds) { 
       const posts = await this.postRepo.find({
+        relations:['member'],
         where: {
           category,
         },
@@ -35,6 +36,7 @@ export class PostService {
 
     // kinds all 조회
     const posts = await this.postRepo.find({
+      relations:['member'],
       where: {
         category,
         kinds,

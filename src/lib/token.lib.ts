@@ -4,9 +4,10 @@ import config from '../../config';
 const { jwtSecret } = config;
 
 // 토큰 생성
-export const createToken = (memberId: string, accessLevel: number) => {
+export const createToken = (memberId: string, accessLevel: number, profileImage?: string) => {
   const payload = {
     memberId,
+    profileImage,
     accessLevel,
   };
 

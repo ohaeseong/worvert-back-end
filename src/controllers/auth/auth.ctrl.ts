@@ -51,7 +51,7 @@ export class AuthCtrl {
       }
 
       // 토큰 발급
-      const token = await tokenLib.createToken(memberId, member.accessLevel);
+      const token = await tokenLib.createToken(memberId, member.accessLevel, member.profileImage);
       const refreshToken = await tokenLib.createRefreshToken(memberId);
 
       res.status(200).json({
@@ -104,9 +104,9 @@ export class AuthCtrl {
         },
       });
 
-      const { login, id } = data;
+      const { login, id, avatar_url } = data;
 
-      const token = await tokenLib.createToken(id, 1);
+      const token = await tokenLib.createToken(id, 1, avatar_url);
       
       res.status(200).json({
         status: 200,

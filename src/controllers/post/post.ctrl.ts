@@ -51,6 +51,9 @@ export class PostCtrl {
         
         post.commentList = commentData.length;
         post.like = likeData.length;
+
+        delete post.member.pw;
+        delete post.member.accessLevel;
       });
       
 
@@ -151,10 +154,6 @@ export class PostCtrl {
       
 
       const id: string = await generatedId();
-
-      if (!thumbnailAddress) {
-        thumbnailAddress = `https://${replace}/static/img/thumbnail_default.png`;
-      }
       
       const postFormData = {
         id,

@@ -13,10 +13,23 @@ const serverAddress = config.replace;
 const should = chai.should();
 const expect = chai.expect;
 
+const MemberFormData = {
+    memberId: 'test',
+    pw: 'test1234',
+    accessLevel: 0,
+    memberName: 'test',
+    profileImage: ''
+} as any;
+
 describe('MemberService Test', async () => {
     before(async () => {
         await connectDatabase();
+
+        Member.save({
+            ...MemberFormData,
+        });
     });
+
 
     context('Login test account', () => {
 
@@ -33,13 +46,6 @@ describe('MemberService Test', async () => {
                 ...MemberFormData,
             });
         });
-
-        afterEach(() => {
-            Member.delete({
-                memberId: 'test',
-            });
-        });
-
         it('should return 200 and token string', (done) => {
             const body = {
                 memberId: 'test',
