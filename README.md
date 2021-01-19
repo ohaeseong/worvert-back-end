@@ -19,3 +19,5 @@ Library
 
 Database
 1. mysql
+
+서버 인프라 구성 안됨 (lamda, ec2 중 고민중)
