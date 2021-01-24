@@ -1,13 +1,16 @@
 import { Service } from 'typedi';
 import { Response } from 'express';
 import { PostService } from '../../services/post.service';
-import { AuthRequest, PostDetail, PostWriteForm } from '../../typings'; 
+import { AuthRequest, PostComment, PostDetail, PostWriteForm } from '../../typings'; 
 import * as Validate  from '../../lib/validate/post.validate';
 import { asyncForeach, generatedId } from '../../lib/method.lib';
 import * as colorConsole from '../../lib/console';
 import config from '../../../config';
 import { PostCommentService } from '../../services/post.comment.service';
 import { PostLikeService } from '../../services/post.like.service';
+import { PostTagService } from '../../services/post.tag.service';
+import { PostReplyCommentService } from '../../services/post.reply.comment.service';
+import { Comment } from '../../database/models/Comment';
 
 const { replace } = config;
 
@@ -17,6 +20,8 @@ export class PostCtrl {
     private postService: PostService,
     private commentService: PostCommentService,
     private likeService: PostLikeService,
+    private tagService: PostTagService,
+    private replyCommentService: PostReplyCommentService,
   ) { }
   
   // 게시글 리스트 조회 함수
@@ -40,20 +45,36 @@ export class PostCtrl {
       
       
       // DB에 있는 데이터를 조회 합니다.
-      const posts = await this.postService.getPostsByLimit(parseInt(limit, 10), 0, category, kinds);
+      const posts = await this.postService.getPostsByLimit(parseInt(limit, 10), category, kinds);
       const allPosts = await this.postService.getAllPostDataByCategory(category, kinds); 
       
       const totalPage = Math.ceil(allPosts.length / parseInt(limit, 10));
 
       await asyncForeach(posts, async (post: PostDetail) => {
-        const commentData = await this.commentService.getPostCommentListAll(post.id);
+        // const commentData = await this.commentService.getPostCommentListAll(post.id);
         const likeData = await this.likeService.getAllLikeByPostId(post.id);
         
-        post.commentList = commentData.length;
+        // post.commentList = commentData.length;
         post.like = likeData.length;
 
         delete post.member.pw;
         delete post.member.accessLevel;
+      });
+
+      await asyncForeach(posts, async (post: PostDetail) => {
+        let replyComments;
+        if (post.comments) {
+          post.commentCount = post.comments.length;
+        }
+        for(let i = 0; i < post.comments.length; i++) {
+          const comment = post.comments[i];
+          replyComments = await this.replyCommentService.getCommentByReplyCommentIdx(comment.idx);
+  
+          if (replyComments) {
+            post.commentCount = post.commentCount + replyComments.length;
+          }
+        }
+      
       });
       
 
@@ -103,14 +124,46 @@ export class PostCtrl {
         return;
       }
 
-      const commentData = await this.commentService.getPostCommentList(5, post.id);
+      delete post.member.pw;
+      delete post.member.accessLevel;
+
+      const commentData = await this.commentService.getPostCommentList(post.id);
+      let replyComments: any;
+
+      let commentCount = 0;
+      let replyCommentCount = 0;
+      if (commentData) {
+        commentCount = commentData.length;
+      }
+
+      await asyncForeach(commentData, async (comment: PostComment) => {
+        replyComments = await this.replyCommentService.getCommentByReplyCommentIdx(comment.idx);
+        comment.replyComments = replyComments;
+
+        if (replyComments) {
+          replyCommentCount = replyCommentCount + replyComments.length;
+        }
+      });
+
+      if (replyComments) {
+        commentCount = replyCommentCount + commentCount;
+      }
+
+
       const likeData = await this.likeService.getAllLikeByPostId(post.id);
+      const tagData = await this.tagService.getTags(post.id);
 
       post.commentList = {
         commentData,
       };
 
-      post.like = likeData.length;
+      post.tagList = {
+        tagData,
+      };
+
+      post.commentCount = commentCount;
+
+      post.like = likeData;
 
       res.status(200).json({
         status: 200,

@@ -1,10 +1,10 @@
-import { BaseEntity, Column, Entity, Generated, JoinColumn, ManyToOne, OneToMany, PrimaryColumn } from "typeorm";
+import { BaseEntity, Column, Entity, Generated, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
+import { Comment } from "./Comment";
 import { Member } from "./Member";
 import { Post } from "./Post";
-import { ReplyComment } from "./ReplyComment";
 
 @Entity()
-export class Comment extends BaseEntity {
+export class ReplyComment extends BaseEntity {
     @PrimaryColumn({ type: 'int', unique: true })
     @Generated('increment')
     idx: number;
@@ -15,6 +15,9 @@ export class Comment extends BaseEntity {
 
     @Column({ type: 'varchar', length: 50 })
     memberId: string;
+
+    @Column({ type: 'int', nullable: true })
+    replyCommentIdx: number;
 
     @Column({ type: 'varchar', length: 100 })
     postId: string;
@@ -29,11 +32,15 @@ export class Comment extends BaseEntity {
     )
     post: Post;
 
-    @OneToMany(
-        (type) => ReplyComment,
-        (comment) => comment.commentIdx, { nullable: false, onDelete: 'CASCADE' },
-      )
-    replyComments: ReplyComment[];
+
+    @ManyToOne(
+        (type) => Comment,
+        (comment) => comment.idx, { nullable: false,  onDelete: 'CASCADE' },
+    )
+    @JoinColumn({
+        name: 'replyCommentIdx'
+      })
+    commentIdx: Comment;
 
     @ManyToOne(
         (type) => Member,

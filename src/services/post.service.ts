@@ -15,12 +15,12 @@ export class PostService {
   ) { }
 
   // 게시글을 요청 받은 limit값과 page 별로 조회 한다.
-  public async getPostsByLimit(limit: number, page: number, category: string, kinds: string) {
+  public async getPostsByLimit(limit: number, category: string, kinds: string) {
 
     // kins 종류별로 게시글 조회
     if (!kinds) { 
       const posts = await this.postRepo.find({
-        relations:['member'],
+        relations:['member', 'comments'],
         where: {
           category,
         },
@@ -36,7 +36,7 @@ export class PostService {
 
     // kinds all 조회
     const posts = await this.postRepo.find({
-      relations:['member'],
+      relations:['member', 'comments'],
       where: {
         category,
         kinds,
@@ -78,6 +78,7 @@ export class PostService {
   // 게시글 id별 조회
   public async getPostById(id: string) {
     const result = await this.postRepo.findOne({
+      relations:['member'],
       where: {
         id,
       }

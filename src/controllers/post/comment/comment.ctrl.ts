@@ -3,8 +3,11 @@ import { Response } from 'express';
 import { PostCommentService } from '../../../services/post.comment.service';
 import * as Validate from '../../../lib/validate/post.validate';
 import * as colorConsole from '../../../lib/console';
-import { AuthRequest } from '../../../typings';
+import { AuthRequest, PostComment } from '../../../typings';
 import { PostService } from '../../../services/post.service';
+import { asyncForeach } from '../../../lib/method.lib';
+import { Comment } from '../../../database/models/Comment';
+import { PostReplyCommentService } from '../../../services/post.reply.comment.service';
 
 // service 계층의 클래스를 의존하고 있으므로 typedi를 이용해 의존성을 주입 해줌
 @Service()
@@ -13,26 +16,31 @@ export class CommentCtrl {
         // comment service 클래스의 속성을 사용할 수 있도록 생성자에서 commentService 타입의 변수 선언
         private commentService: PostCommentService,
         private postService: PostService,
+        private replyCommentService: PostReplyCommentService,
     ) { }
 
     // 댓글 목록 조회 api 기본적으로 댓글 목록은 게시글 조회시 함께 전달 되지만 추가적인 댓글 조회는 해당 api에서 진행된다.
     public getComments = async (req: AuthRequest, res: Response) => {
         colorConsole.info('[GET] comments list lookup api was called');
-        const limit = req.query.limit as string;
+        // const limit = req.query.limit as string;
         const postId = req.query.postId as string;
 
-        if (!limit || parseInt(limit) < 0) {
+        if (!postId) {
             res.status(400).json({
                 status: 400,
-                message: 'limit is not to be minus number try again! or you\'re not input the limit!'
+                message: 'postId is null!'
             });
 
             return;
         }
 
         try {
-            const commentData = await this.commentService.getPostCommentList(parseInt(limit), postId);
+            const commentData = await this.commentService.getPostCommentList(postId);
             
+            await asyncForeach(commentData, async (comment: PostComment) => {
+                const replyComment = await this.replyCommentService.getCommentByReplyCommentIdx(comment.idx);
+                comment.replyComments = replyComment;
+            });
             res.status(200).json({
                 status: 200,
                 message: 'comment lookup success!',
@@ -48,7 +56,7 @@ export class CommentCtrl {
                 message: 'server error!',
             });
         }
-    }
+    };
 
     // 댓글 작성 api
     public createComment = async (req: AuthRequest, res: Response) => {
@@ -95,7 +103,7 @@ export class CommentCtrl {
                 message: 'server error!',
             });
         }
-    }
+    };
 
     // 댓글 수정 api
     public updateComment = async (req: AuthRequest, res: Response) => {
@@ -142,7 +150,7 @@ export class CommentCtrl {
                 message: 'server error!',
             });
         }
-    }
+    };
 
     // 댓글 삭제 api
     public deleteComment = async (req: AuthRequest, res: Response) => {
@@ -209,5 +217,73 @@ export class CommentCtrl {
                 message: 'server error!',
             });
         }
-    }
+    };
+
+    public replyComment = async (req: AuthRequest, res: Response) => {
+        colorConsole.info('[POST] reply comment get api was called');
+        const { body, decoded } = req;
+
+        try {
+            await Validate.createPostReplyCommentValidate(body);
+        } catch (error) {
+            res.status(400).json({
+                status: 400,
+                message: 'comment create body form is wrong!',
+            });
+
+            return;
+        }
+
+        try {
+            const { commentTxt, replyCommentIdx, postId } = body;
+            const { memberId } = decoded;
+
+            await this.replyCommentService.createReplyPostComment(commentTxt, memberId, replyCommentIdx, postId);
+
+            res.status(200).json({
+                status:200,
+                message: 'create reply comment success!',
+            });
+        } catch (error) {
+            colorConsole.error(error);
+
+            res.status(500).json({
+                status: 500,
+                message: 'server error!',
+            });
+        }
+    };
+
+    public getReplyComment = async (req: AuthRequest, res: Response) => {
+        colorConsole.info('[GET] reply comment get api was called');
+        const replyCommentIdx = req.query.replyCommentIdx as string;
+
+        if (!replyCommentIdx) {
+            res.status(400).json({
+                status: 400,
+                message: 'replyCommentIdx is null!',
+            });
+
+            return;
+        }
+
+        try {
+            const commentData = await this.replyCommentService.getCommentByReplyCommentIdx(parseInt(replyCommentIdx));
+
+            res.status(200).json({
+                status:200,
+                message: 'create reply comment success!',
+                data: {
+                    commentData,
+                }
+            });
+        } catch (error) {
+            colorConsole.error(error);
+
+            res.status(500).json({
+                status: 500,
+                message: 'server error!',
+            });
+        }
+    };
 }

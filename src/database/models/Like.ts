@@ -1,4 +1,5 @@
-import { BaseEntity, Column, Entity, Generated, ManyToOne, PrimaryColumn } from "typeorm";
+import { BaseEntity, Column, Entity, Generated, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
+import { Member } from "./Member";
 import { Post } from "./Post";
 
 @Entity()
@@ -15,7 +16,16 @@ export class Like extends BaseEntity {
 
     @ManyToOne(
         (type) => Post,
-        (post) => post.id, { nullable: false, },
+        (post) => post.id, { nullable: false, onDelete: 'CASCADE' },
     )
     post!: Post;
+
+    @ManyToOne(
+        (type) => Member,
+        (member) => member.memberId, { nullable: false , onDelete: 'CASCADE'},
+      )
+      @JoinColumn({
+        name: 'memberId'
+      })
+    member: Member;
 }
