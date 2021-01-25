@@ -157,6 +157,7 @@ export class CommentCtrl {
         colorConsole.info('[DELETE] comment delete api was called');
         const commentIdx = req.query.commentIdx as string;
         const { decoded } = req;
+        
 
         if (!commentIdx) {
             res.status(400).json({
@@ -276,6 +277,40 @@ export class CommentCtrl {
                 data: {
                     commentData,
                 }
+            });
+        } catch (error) {
+            colorConsole.error(error);
+
+            res.status(500).json({
+                status: 500,
+                message: 'server error!',
+            });
+        }
+    };
+
+    public deleteReplyComment = async (req: AuthRequest, res: Response) => {
+        colorConsole.info('[DELETE] reply comment get api was called');
+        const commentIdx = req.query.commentIdx as string;
+        // const { decoded } = req;
+
+        console.log(commentIdx);
+        
+
+        if (!commentIdx) {
+            res.status(400).json({
+                status: 400,
+                message: 'commentIdx is null!',
+            });
+
+            return;
+        }
+
+        try {
+            await this.replyCommentService.deleteReplyCommentByCommentIdx(parseInt(commentIdx));
+
+            res.status(200).json({
+                status:200,
+                message: 'delete reply comment success!',
             });
         } catch (error) {
             colorConsole.error(error);

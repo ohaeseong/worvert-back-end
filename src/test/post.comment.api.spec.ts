@@ -3,6 +3,7 @@ import chaiHttp from 'chai-http';
 
 import config from '../../config';
 import { Comment } from '../database/models/Comment';
+import { ReplyComment } from '../database/models/ReplyComment';
 import { Post } from '../database/models/Post';
 
 chai.use(chaiHttp);
@@ -29,6 +30,14 @@ const commentData = {
     memberId: 'test',
     postId: 'test',
     commentTxt: 'test',
+} as any;
+
+const replyCommentData = {
+    idx: -1,
+    memberId: 'test',
+    postId: 'test',
+    commentTxt: 'test',
+    replyCommentIdx: -1,
 } as any;
 
 describe('PostCommentService', async () => {
@@ -291,7 +300,7 @@ describe('PostCommentService', async () => {
         });
     });
 
-      context('Get Reply Comment of post', () => {
+    context('Get Reply Comment of post', () => {
 
         it('should return 200 status code', (done) => {
             const params = {
@@ -312,6 +321,40 @@ describe('PostCommentService', async () => {
 
             chai.request(serverAddress)
             .get('/api/post/comment/reply')
+            .set('token', testToken)
+            .end((err, res) => {
+                expect(res, err).to.have.status(400);
+                done();
+            });
+        });
+    });
+
+    context('delete Reply Comment of post', () => {
+        beforeEach(() => {
+            ReplyComment.save({
+                ...replyCommentData,
+            });
+        });
+        it('should return 200 status code', (done) => {
+            const params = {
+                commentIdx: -1,
+            };
+
+            chai.request(serverAddress)
+            .delete('/api/post/comment/reply')
+            .query(params)
+            .set('token', testToken)
+            .end((err, res) => {
+                expect(res, err).to.have.status(200);
+                done();
+            });
+        });
+
+
+        it('should return 400 status code', (done) => {
+
+            chai.request(serverAddress)
+            .delete('/api/post/comment/reply')
             .set('token', testToken)
             .end((err, res) => {
                 expect(res, err).to.have.status(400);

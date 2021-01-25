@@ -27,6 +27,7 @@ export class CommentRoute {
         this.router.get('/reply', this.commentCtrl.getReplyComment);
         this.router.put('/', authMiddleWare, this.commentCtrl.updateComment);
         this.router.delete('/', authMiddleWare, this.commentCtrl.deleteComment);
+        this.router.delete('/reply', authMiddleWare, this.commentCtrl.deleteReplyComment);
     }
 
     public getRouter() {

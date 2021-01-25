@@ -81,4 +81,13 @@ export class PostReplyCommentService {
 
         return commentData;
     }
+
+        // reply comment idx로 댓글 조회
+        public async deleteReplyCommentByCommentIdx(replyCommentIdx: number) {
+            const commentData = await this.replyCommentRepo.delete({
+                idx: replyCommentIdx,
+            });
+    
+            return commentData;
+        }
 }
