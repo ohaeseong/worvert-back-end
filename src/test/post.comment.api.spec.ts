@@ -362,4 +362,39 @@ describe('PostCommentService', async () => {
             });
         });
     });
+
+    context('update Reply Comment of post', () => {
+        beforeEach(() => {
+            ReplyComment.save({
+                ...replyCommentData,
+            });
+        });
+        it('should return 200 status code', (done) => {
+            const body = {
+                commentIdx: -1,
+                commentTxt: 'testest입니다'
+            };
+
+            chai.request(serverAddress)
+            .put('/api/post/comment/reply')
+            .send(body)
+            .set('token', testToken)
+            .end((err, res) => {
+                expect(res, err).to.have.status(200);
+                done();
+            });
+        });
+
+
+        it('should return 400 status code', (done) => {
+
+            chai.request(serverAddress)
+            .delete('/api/post/comment/reply')
+            .set('token', testToken)
+            .end((err, res) => {
+                expect(res, err).to.have.status(400);
+                done();
+            });
+        });
+    });
 });

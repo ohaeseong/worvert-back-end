@@ -21,18 +21,18 @@ export class PostReplyCommentService {
         return commentData;
     }
 
-    public async getPostCommentListAll(postId: string) {
-        const commentData = await this.replyCommentRepo.find({
-            where: {
-                postId,
-            },
-        });
+    // public async getPostCommentListAll(postId: string) {
+    //     const commentData = await this.replyCommentRepo.find({
+    //         where: {
+    //             postId,
+    //         },
+    //     });
 
-        return commentData;
-    }
+    //     return commentData;
+    // }
 
     // 게시글 댓글 수정 함수
-    public async updatePostComment(idx: number, commentTxt: string) {
+    public async updateReplyComment(idx: number, commentTxt: string) {
         const commentData = await this.replyCommentRepo.update({
             idx,
         }, {
@@ -82,12 +82,12 @@ export class PostReplyCommentService {
         return commentData;
     }
 
-        // reply comment idx로 댓글 조회
-        public async deleteReplyCommentByCommentIdx(replyCommentIdx: number) {
-            const commentData = await this.replyCommentRepo.delete({
-                idx: replyCommentIdx,
-            });
-    
-            return commentData;
-        }
+    // reply comment idx로 댓글 조회
+    public async deleteReplyCommentByCommentIdx(replyCommentIdx: number) {
+        const commentData = await this.replyCommentRepo.delete({
+            idx: replyCommentIdx,
+        });
+
+        return commentData;
+    }
 }

@@ -158,7 +158,6 @@ export class CommentCtrl {
         const commentIdx = req.query.commentIdx as string;
         const { decoded } = req;
         
-
         if (!commentIdx) {
             res.status(400).json({
                 status: 400,
@@ -293,9 +292,6 @@ export class CommentCtrl {
         const commentIdx = req.query.commentIdx as string;
         // const { decoded } = req;
 
-        console.log(commentIdx);
-        
-
         if (!commentIdx) {
             res.status(400).json({
                 status: 400,
@@ -311,6 +307,52 @@ export class CommentCtrl {
             res.status(200).json({
                 status:200,
                 message: 'delete reply comment success!',
+            });
+        } catch (error) {
+            colorConsole.error(error);
+
+            res.status(500).json({
+                status: 500,
+                message: 'server error!',
+            });
+        }
+    };
+
+    public updateReplyComment = async (req: AuthRequest, res: Response) => {
+        colorConsole.info('[PUT] reply comment update api was called');
+        const { body, decoded } = req;
+
+        try {
+            await Validate.updatePostCommentValidate(body);
+        } catch (error) {
+            res.status(400).json({
+                status: 400,
+                message: 'comment update body form is wrong! try again',
+            });
+
+            return;
+        }
+
+        try {
+            const { commentIdx, commentTxt } = body;
+            // const { memberId } = decoded;
+
+            // const comment = await this.commentService.getCommentForDiscrimination(commentIdx, memberId);
+
+            // if (!comment) {
+            //     res.status(403).json({
+            //         status: 403,
+            //         message: 'you don\'t have update permission of this comment!',
+            //     });
+
+            //     return;
+            // }
+
+            await this.replyCommentService.updateReplyComment(commentIdx, commentTxt);
+
+            res.status(200).json({
+                status:200,
+                message: 'update comment success!',
             });
         } catch (error) {
             colorConsole.error(error);
