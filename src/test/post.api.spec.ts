@@ -113,7 +113,7 @@ describe('PostService', async () => {
                     `).to.should.have.be.a('object');
                     done();
                 });
-            }, 1000);
+            }, 1500);
         });
 
         it('should return 404  wait 1s for asynchronous', (done) => {

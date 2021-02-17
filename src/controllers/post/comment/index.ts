@@ -21,10 +21,14 @@ export class CommentRoute {
     }
 
     private setRouter() {
-        this.router.post('/',authMiddleWare, this.commentCtrl.createComment);
+        this.router.post('/', authMiddleWare, this.commentCtrl.createComment);
+        this.router.post('/reply', authMiddleWare, this.commentCtrl.replyComment);
         this.router.get('/', this.commentCtrl.getComments);
+        this.router.get('/reply', this.commentCtrl.getReplyComment);
         this.router.put('/', authMiddleWare, this.commentCtrl.updateComment);
+        this.router.put('/reply', authMiddleWare, this.commentCtrl.updateReplyComment);
         this.router.delete('/', authMiddleWare, this.commentCtrl.deleteComment);
+        this.router.delete('/reply', authMiddleWare, this.commentCtrl.deleteReplyComment);
     }
 
     public getRouter() {

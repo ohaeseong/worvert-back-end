@@ -2,6 +2,7 @@ import { Entity, BaseEntity, Column, PrimaryColumn, OneToMany, ManyToOne, JoinCo
 import { Comment } from './Comment';
 import { Like } from './Like';
 import { Member } from './Member';
+import { Tag } from './Tag';
 
 // 게시글 모델 구성
 @Entity()
@@ -23,6 +24,9 @@ export class Post extends BaseEntity {
 
   @Column({ type: 'varchar', nullable: false })
   kinds: string;
+
+  @Column({ type: 'int', default: () => 0 })
+  state: number;
 
   @Column({ type: 'varchar' })
   category: string;
@@ -48,9 +52,15 @@ export class Post extends BaseEntity {
   )
   likes!: Like[];
 
+  @OneToMany(
+    (type) => Tag,
+    (tag) => tag.post, { nullable: true },
+  )
+  tags!: Tag[];
+
   @ManyToOne(
     (type) => Member,
-    (member) => member.memberId, { nullable: false },
+    (member) => member.memberId, { nullable: false, onDelete: 'CASCADE' },
   )
   @JoinColumn({
     name: 'memberId'

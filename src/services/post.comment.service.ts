@@ -23,15 +23,15 @@ export class PostCommentService {
     }
 
     // 게시글 댓글 목록 조회 조회 방식은 load more형식이므로 skip이 필요 없다.
-    public async getPostCommentList(limit: number, postId: string) {
+    public async getPostCommentList(postId: string) {
         const commentData = await this.commentRepo.find({
+            relations: ['member'],
             where: {
                 postId,
             },
             order: {
                 createDate: "DESC",
             },
-            take: limit,
         });
 
         return commentData;

@@ -35,6 +35,16 @@ export const updatePostValidate = (body: Object) => {
   
     return schema.validateAsync(body);
   };
+
+  export const createPostReplyCommentValidate = (body: Object) => {
+    const schema = Joi.object().keys({
+      commentTxt: Joi.string().max(1000).required(),
+      postId: Joi.string().required(),
+      replyCommentIdx: Joi.number().integer(),
+    });
+  
+    return schema.validateAsync(body);
+  }
   
   // 게시글 댓글 수정 요청 값 검사 함수
   export const updatePostCommentValidate = (body: Object) => {

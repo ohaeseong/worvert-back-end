@@ -3,6 +3,7 @@ import chaiHttp from 'chai-http';
 
 import config from '../../config';
 import { Comment } from '../database/models/Comment';
+import { ReplyComment } from '../database/models/ReplyComment';
 import { Post } from '../database/models/Post';
 
 chai.use(chaiHttp);
@@ -29,6 +30,14 @@ const commentData = {
     memberId: 'test',
     postId: 'test',
     commentTxt: 'test',
+} as any;
+
+const replyCommentData = {
+    idx: -1,
+    memberId: 'test',
+    postId: 'test',
+    commentTxt: 'test',
+    replyCommentIdx: -1,
 } as any;
 
 describe('PostCommentService', async () => {
@@ -89,6 +98,35 @@ describe('PostCommentService', async () => {
             .send(body)
             .end((err, res) => {
                 expect(res, err).to.have.status(404);
+                done();
+            });
+        });
+    });
+
+    context('Read Post Comment', () => {
+
+        it('should return 200 status code', (done) => {
+            const params = {
+                postId: 'test',
+            };
+
+            chai.request(serverAddress)
+            .get('/api/post/comment')
+            .query(params)
+            .end((err, res) => {
+                expect(res, err).to.have.status(200);
+                done();
+            });
+        });
+
+
+        it('should return 400 status code', (done) => {
+
+            chai.request(serverAddress)
+            .get('/api/post/comment')
+            .set('token', testToken)
+            .end((err, res) => {
+                expect(res, err).to.have.status(400);
                 done();
             });
         });
@@ -215,6 +253,148 @@ describe('PostCommentService', async () => {
                 done();
             });
         });
+    });
 
+    // reply comment test code
+    context('Write Reply Comment of post', () => {
+        beforeEach(() => {
+            Comment.save({
+                ...commentData,
+            });
+        });
+
+        afterEach(() => {
+            Comment.delete({
+                idx: -1,
+            });
+        });
+        it('should return 200 status code', (done) => {
+            const body = {
+                replyCommentIdx: -1,
+                postId: 'test',
+                commentTxt: 'testadfasd',
+            };
+
+            setTimeout(() => {
+                chai.request(serverAddress)
+                .post('/api/post/comment/reply')
+                .set('token', testToken)
+                .send(body)
+                .end((err, res) => {
+                    expect(res, err).to.have.status(200);
+                    done();
+                });
+            }, 1000);
+        });
+
+
+        it('should return 400 status code', (done) => {
+
+            chai.request(serverAddress)
+            .post('/api/post/comment/reply')
+            .set('token', testToken)
+            .end((err, res) => {
+                expect(res, err).to.have.status(400);
+                done();
+            });
+        });
+    });
+
+    context('Get Reply Comment of post', () => {
+
+        it('should return 200 status code', (done) => {
+            const params = {
+                replyCommentIdx: -1,
+            };
+
+            chai.request(serverAddress)
+            .get('/api/post/comment/reply')
+            .query(params)
+            .end((err, res) => {
+                expect(res, err).to.have.status(200);
+                done();
+            });
+        });
+
+
+        it('should return 400 status code', (done) => {
+
+            chai.request(serverAddress)
+            .get('/api/post/comment/reply')
+            .set('token', testToken)
+            .end((err, res) => {
+                expect(res, err).to.have.status(400);
+                done();
+            });
+        });
+    });
+
+    context('delete Reply Comment of post', () => {
+        beforeEach(() => {
+            ReplyComment.save({
+                ...replyCommentData,
+            });
+        });
+        it('should return 200 status code', (done) => {
+            const params = {
+                commentIdx: -1,
+            };
+
+            chai.request(serverAddress)
+            .delete('/api/post/comment/reply')
+            .query(params)
+            .set('token', testToken)
+            .end((err, res) => {
+                expect(res, err).to.have.status(200);
+                done();
+            });
+        });
+
+
+        it('should return 400 status code', (done) => {
+
+            chai.request(serverAddress)
+            .delete('/api/post/comment/reply')
+            .set('token', testToken)
+            .end((err, res) => {
+                expect(res, err).to.have.status(400);
+                done();
+            });
+        });
+    });
+
+    context('update Reply Comment of post', () => {
+        beforeEach(() => {
+            ReplyComment.save({
+                ...replyCommentData,
+            });
+        });
+        it('should return 200 status code', (done) => {
+            const body = {
+                commentIdx: -1,
+                commentTxt: 'testest입니다'
+            };
+
+            chai.request(serverAddress)
+            .put('/api/post/comment/reply')
+            .send(body)
+            .set('token', testToken)
+            .end((err, res) => {
+                expect(res, err).to.have.status(200);
+                done();
+            });
+        });
+
+
+        it('should return 400 status code', (done) => {
+
+            chai.request(serverAddress)
+            .delete('/api/post/comment/reply')
+            .set('token', testToken)
+            .end((err, res) => {
+                expect(res, err).to.have.status(400);
+                done();
+            });
+        });
     });
 });

@@ -104,7 +104,21 @@ export class AuthCtrl {
         },
       });
 
-      const { login, id, avatar_url } = data;
+      const { login, id, avatar_url, name } = data;
+
+      const member = await this.authService.findUserById(id);
+
+      if (!member) {
+        const memberData = {
+          memberId: id,
+          pw: 'no needs password',
+          accessLevel: 1,
+          memberName: name,
+          profileImage: avatar_url,
+        };
+
+        await this.authService.createUserWithGithub(memberData);
+      }
 
       const token = await tokenLib.createToken(id, 1, avatar_url);
       
