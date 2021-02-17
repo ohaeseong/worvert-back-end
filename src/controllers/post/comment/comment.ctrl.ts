@@ -335,18 +335,6 @@ export class CommentCtrl {
 
         try {
             const { commentIdx, commentTxt } = body;
-            // const { memberId } = decoded;
-
-            // const comment = await this.commentService.getCommentForDiscrimination(commentIdx, memberId);
-
-            // if (!comment) {
-            //     res.status(403).json({
-            //         status: 403,
-            //         message: 'you don\'t have update permission of this comment!',
-            //     });
-
-            //     return;
-            // }
 
             await this.replyCommentService.updateReplyComment(commentIdx, commentTxt);
 

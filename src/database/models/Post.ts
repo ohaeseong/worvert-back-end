@@ -25,6 +25,9 @@ export class Post extends BaseEntity {
   @Column({ type: 'varchar', nullable: false })
   kinds: string;
 
+  @Column({ type: 'int', default: () => 0 })
+  state: number;
+
   @Column({ type: 'varchar' })
   category: string;
 

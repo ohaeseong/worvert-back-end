@@ -23,6 +23,7 @@ export class PostService {
         relations:['member', 'comments'],
         where: {
           category,
+          state: 1,
         },
         order: {
           createTime: "DESC"
