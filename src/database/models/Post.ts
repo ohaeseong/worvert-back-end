@@ -22,13 +22,13 @@ export class Post extends BaseEntity {
   @Column({ type: 'varchar', nullable: true })
   series: string;
 
-  @Column({ type: 'varchar', nullable: false })
+  @Column({ type: 'varchar', nullable: true })
   kinds: string;
 
   @Column({ type: 'int', default: () => 0 })
   state: number;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', nullable: true })
   category: string;
 
   @Column({ type: 'varchar' })

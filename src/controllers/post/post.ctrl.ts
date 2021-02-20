@@ -202,21 +202,15 @@ export class PostCtrl {
 
     try {
       const { memberId } = decoded;
-      const { title, contents, category, series, kinds } = body;
-      let { thumbnailAddress } = body;
+      const { title, contents } = body;
       
-
       const id: string = await generatedId();
       
       const postFormData = {
         id,
-        title,
-        contents,
-        category,
-        thumbnailAddress,
-        series,
-        kinds,
         memberId,
+        contents,
+        title,
       } as PostWriteForm;
 
       // DB에 저장하는 함수를 실행합니다.

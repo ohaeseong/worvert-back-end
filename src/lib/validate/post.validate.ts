@@ -5,10 +5,10 @@ export const writePostValidate = (body: Object) => {
     const schema = Joi.object().keys({
       title: Joi.string().max(50).required(),
       contents: Joi.string().required(),
-      category: Joi.string().required(),
-      series: Joi.string().allow(null).allow(''),
-      kinds: Joi.string().required(),
-      thumbnailAddress: Joi.string().allow(null).allow(''),
+      // category: Joi.string().required(),
+      // series: Joi.string().allow(null).allow(''),
+      // kinds: Joi.string().required(),
+      // thumbnailAddress: Joi.string().allow(null).allow(''),
     });
   
     return schema.validateAsync(body);
