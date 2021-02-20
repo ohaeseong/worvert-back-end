@@ -136,10 +136,6 @@ describe('PostService', async () => {
             const body = {
                 title: 'this is test title!!@@',
                 contents: 'this is test contents~',
-                category: 'TEST',
-                series: 'TEST series',
-                kinds: 'front-end',
-                thumbnailAddress: '',
             };
 
             chai.request(serverAddress)
