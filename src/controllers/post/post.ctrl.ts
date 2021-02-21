@@ -214,11 +214,14 @@ export class PostCtrl {
       } as PostWriteForm;
 
       // DB에 저장하는 함수를 실행합니다.
-      await this.postService.createPost(postFormData);
+      const post = await this.postService.createPost(postFormData);
 
       res.status(200).json({
         status: 200,
         message: '게시글 작성 성공',
+        data: {
+          ...post,
+        }
       });
     } catch (error) {
       console.error(error);
