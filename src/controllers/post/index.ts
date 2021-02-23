@@ -28,6 +28,7 @@ export class PostRoute {
     this.router.get('/detail/:id', this.postCtrl.getPostById);
     this.router.post('/', authMiddleWare, this.postCtrl.writePost);
     this.router.put('/', authMiddleWare, this.postCtrl.updatePost);
+    this.router.put('/publish', authMiddleWare, this.postCtrl.publishPost);
     this.router.delete('/', authMiddleWare, this.postCtrl.deletePost);
 
     // comment api route setting

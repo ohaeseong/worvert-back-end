@@ -283,4 +283,48 @@ describe('PostService', async () => {
         });
     });
 
+    
+    context('Publish post api', () => {
+        beforeEach(()  => {
+             Post.save({
+                ...postFormData,
+            });
+        });
+
+        afterEach(() => {
+            Post.delete({
+                id: 'test',
+            });
+        });
+
+        it('should return 200 wait 1s for asynchronous', (done) => {
+            const body = { id: 'test' };
+
+            setTimeout(() => {
+                chai.request(serverAddress)
+                .put('/api/post/publish')
+                .set('token', testToken)
+                .send(body)
+                .end((err, res) => {
+                    expect(res, err).to.have.status(200);
+                    done();
+                });
+            }, 1000);
+        });
+
+        it('should return 400', (done) => {
+            const params = { id: '' };
+
+            chai.request(serverAddress)
+                .put('/api/post/publish')
+                .set('token', testToken)
+                .query({id: params.id})
+                .end((err, res) => {
+                    expect(res, err).to.have.status(400);
+                    done();
+                });
+        });
+    });
+
+
 });
