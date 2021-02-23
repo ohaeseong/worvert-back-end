@@ -181,6 +181,36 @@ export class PostCtrl {
     }
   };
 
+  public publishPost = async (req: AuthRequest, res: Response) => {
+    colorConsole.info('[PUT] post publish api was called');
+    const { body, decoded } = req;
+    if (!body.id) {
+
+      res.status(400).json({
+        status: 400,
+        message: 'id를 포함해서 요청해 주세요.'
+      });
+
+      return
+    }
+
+    try {
+      const { id } = body;
+      await this.postService.updatePostStatusToPublish(id);
+
+      res.status(200).json({
+        status: 200,
+        message: '게시글 출판 성공',
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        status: 500,
+        message: '게시글 조회 실패!'
+      });
+    }
+  };
+
   // 게시글 작성 함수
   public writePost = async (req: AuthRequest, res: Response) => {
     colorConsole.info('[POST] post write api was called');
