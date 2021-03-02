@@ -123,11 +123,14 @@ export class PostService {
   }
 
   // 게시글 상태를 공개로 수정 => 출판 상태
-  public async updatePostStatusToPublish(id: string) {
+  public async updatePostStatusToPublish(id: string, kinds: string, thumbnailAddress: string, category: string) {
     const result =  await this.postRepo.update({
       id,
     }, {
       state: 1,
+      kinds,
+      thumbnailAddress,
+      category
     });
 
     return result;
