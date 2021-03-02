@@ -183,20 +183,26 @@ export class PostCtrl {
 
   public publishPost = async (req: AuthRequest, res: Response) => {
     colorConsole.info('[PUT] post publish api was called');
-    const { body, decoded } = req;
-    if (!body.id) {
+    const { body } = req;
 
+    try {
+      await Validate.publishPostValidate(body);
+    } catch (error) {
+      colorConsole.error(error);
+      
       res.status(400).json({
         status: 400,
-        message: 'id를 포함해서 요청해 주세요.'
+        message: '양식이 맞지 않아요!'
       });
 
       return
     }
 
     try {
-      const { id } = body;
-      await this.postService.updatePostStatusToPublish(id);
+      const { id, kinds, thumbnailAddress, category } = body;
+      console.log(body);
+      
+      await this.postService.updatePostStatusToPublish(id, kinds, thumbnailAddress, category);
 
       res.status(200).json({
         status: 200,
