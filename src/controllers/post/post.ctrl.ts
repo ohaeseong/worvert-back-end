@@ -199,10 +199,9 @@ export class PostCtrl {
     }
 
     try {
-      const { id, kinds, thumbnailAddress, category } = body;
-      console.log(body);
+      const { id, kinds, thumbnailAddress, category, slugUrl, intro, publishType } = body;
       
-      await this.postService.updatePostStatusToPublish(id, kinds, thumbnailAddress, category);
+      await this.postService.updatePostStatusToPublish(id, kinds, thumbnailAddress, category, slugUrl, intro, publishType);
 
       res.status(200).json({
         status: 200,

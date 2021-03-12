@@ -62,7 +62,10 @@ export const publishPostValidate = (body: Object) => {
     id: Joi.string().required(),
     kinds: Joi.string().required(),
     thumbnailAddress: Joi.string().allow(null).allow(''),
+    publishType: Joi.number().integer().required(),
+    intro: Joi.string().allow(null).allow(''),
     category: Joi.string().required(),
+    slugUrl: Joi.string().required(),
   });
 
   return schema.validateAsync(body);

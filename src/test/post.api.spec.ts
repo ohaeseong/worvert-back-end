@@ -298,7 +298,14 @@ describe('PostService', async () => {
         });
 
         it('should return 200 wait 1s for asynchronous', (done) => {
-            const body = { id: 'test' };
+            const body = { 
+                id: 'test', 
+                category: 'blog', 
+                kinds: 'front-end', 
+                thumbnailAddress: '', 
+                intro: '', slugUrl: '/@test/postname', 
+                publishType: 1 
+            };
 
             setTimeout(() => {
                 chai.request(serverAddress)

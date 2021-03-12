@@ -35,7 +35,6 @@ export class AuthService {
   };
 
   public async createUserWithGithub(memberData: MemberData) {
-    const {  } = memberData;
     const member = await this.memberRepo.save({
       ...memberData,
     });

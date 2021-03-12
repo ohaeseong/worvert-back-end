@@ -4,6 +4,7 @@ import { PostCtrl } from './post.ctrl';
 import authMiddleWare from '../../middlewares/auth.middleware';
 import { CommentRoute } from './comment';
 import { LikeRoute } from './like';
+import { TemporaryRoute } from './temporary';
 
 // dependency injection type di
 @Service()
@@ -34,6 +35,7 @@ export class PostRoute {
     // comment api route setting
     this.router.use('/comment', Container.get(CommentRoute).getRouter());
     this.router.use('/like', Container.get(LikeRoute).getRouter());
+    this.router.use('/temporary', Container.get(TemporaryRoute).getRouter());
   }
 
   // postRouter 값 리턴 함수 (외부에서 router  접근이 가능 하도록 만든 함수)
