@@ -54,12 +54,15 @@ export class AuthCtrl {
       const token = await tokenLib.createToken(memberId, member.accessLevel, member.profileImage);
       const refreshToken = await tokenLib.createRefreshToken(memberId);
 
+      delete member.pw;
+
       res.status(200).json({
         status: 200,
         message: '로그인 성공!',
         data: {
           token,
           refreshToken,
+          member,
         }
       });
     } catch (error) {
@@ -107,6 +110,7 @@ export class AuthCtrl {
       const { login, id, avatar_url, name } = data;
 
       const member = await this.authService.findUserById(id);
+      let userInfo;
 
       if (!member) {
         const memberData = {
@@ -117,16 +121,21 @@ export class AuthCtrl {
           profileImage: avatar_url,
         };
 
-        await this.authService.createUserWithGithub(memberData);
+        userInfo = await this.authService.createUserWithGithub(memberData);
+      } else {
+        userInfo = member;
       }
 
       const token = await tokenLib.createToken(id, 1, avatar_url);
       
+      delete userInfo.pw;
+
       res.status(200).json({
         status: 200,
         message: '깃헙 로그인 성공!',
         data: {
           token,
+          member: { ...userInfo },
         },
       });
         

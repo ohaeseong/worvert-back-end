@@ -26,6 +26,9 @@ export class Post extends BaseEntity {
   url: string;
 
   @Column({ type: 'varchar', nullable: true })
+  intro: string;
+
+  @Column({ type: 'varchar', nullable: true })
   kinds: string;
 
   @Column({ type: 'int', default: () => 0 })
