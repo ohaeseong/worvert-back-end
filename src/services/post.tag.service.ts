@@ -20,4 +20,13 @@ export class PostTagService {
 
     return tags;
   }
+
+  public async addTag(postId: string, tagName: string) {
+    const tag = await this.tagRepo.save({
+        postId,
+        tagName,
+    });
+
+    return tag;
+  }
 }

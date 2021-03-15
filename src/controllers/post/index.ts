@@ -3,6 +3,7 @@ import Container, { Service } from 'typedi';
 import { PostCtrl } from './post.ctrl';
 import authMiddleWare from '../../middlewares/auth.middleware';
 import { CommentRoute } from './comment';
+import { TagRoute } from './tag';
 import { LikeRoute } from './like';
 import { TemporaryRoute } from './temporary';
 
@@ -36,6 +37,7 @@ export class PostRoute {
     this.router.use('/comment', Container.get(CommentRoute).getRouter());
     this.router.use('/like', Container.get(LikeRoute).getRouter());
     this.router.use('/temporary', Container.get(TemporaryRoute).getRouter());
+    this.router.use('/tag', Container.get(TagRoute).getRouter());
   }
 
   // postRouter 값 리턴 함수 (외부에서 router  접근이 가능 하도록 만든 함수)

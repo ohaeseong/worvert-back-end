@@ -28,7 +28,7 @@ export class TemporaryCtrl {
         try {
             res.status(200).json({
                 status: 200,
-                message: 'canceled like in post!',
+                message: 'get temporary posts!',
             });
         } catch (error) {
             colorConsole.error(error);
