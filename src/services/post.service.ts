@@ -52,6 +52,24 @@ export class PostService {
     return posts;
   }
 
+  public async getPostsByMemberId(memberId: string, limit: number) {
+
+    // posts member별 조회
+    const posts = await this.postRepo.find({
+      relations:['member', 'comments'],
+      where: {
+        memberId,
+      },
+      order: {
+        createTime: "DESC"
+      },
+      skip: 0,
+      take: limit,
+    });
+
+    return posts;
+  }
+
   // 게시글 카테고리 별 전체 조회
   public async getAllPostDataByCategory(category: string, kinds: string) {
 
