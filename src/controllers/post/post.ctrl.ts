@@ -185,8 +185,8 @@ export class PostCtrl {
       const post: PostDetail = await this.postService.getPostById(id);
 
       if(!post) {
-        res.status(200).json({
-          status: 200,
+        res.status(404).json({
+          status: 404,
           messgae: '게시글을 찾을 수 없습니다.',
         });
 
