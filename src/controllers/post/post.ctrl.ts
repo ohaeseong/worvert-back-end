@@ -184,14 +184,14 @@ export class PostCtrl {
       // DB에 있는 데이터를 조회 합니다.
       const post: PostDetail = await this.postService.getPostById(id);
 
-      if(!post) {
-        res.status(404).json({
-          status: 404,
-          messgae: '게시글을 찾을 수 없습니다.',
-        });
+      // if(!post) {
+      //   res.status(404).json({
+      //     status: 404,
+      //     messgae: '게시글을 찾을 수 없습니다.',
+      //   });
 
-        return;
-      }
+      //   return;
+      // }
 
       delete post.member.pw;
       delete post.member.accessLevel;
