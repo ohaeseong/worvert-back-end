@@ -6,6 +6,7 @@ WORKDIR /tech-diary-back-end-version2.
 
 COPY package*.json ./
 COPY tsconfig.json ./
+COPY ormconfig.json ./
 
 RUN yarn
 
