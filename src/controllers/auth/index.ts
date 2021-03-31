@@ -22,6 +22,7 @@ export class AuthRoute {
   public setRouter() {
     this.router.post('/login', this.authCtrl.login);
     this.router.post('/login/with-github', this.authCtrl.loginWithGithub);
+    this.router.post('/login/with-github/mobile', this.authCtrl.loginWIthGithubForMobile);
   }
 
   // authRouter 값 리턴 함수 (외부에서 router  접근이 가능 하도록 만든 함수)
