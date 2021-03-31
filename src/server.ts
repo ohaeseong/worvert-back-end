@@ -27,7 +27,7 @@ class Server {
   // middleWare set
   private setMiddleWare() {
     this.app.use(cors());
-    this.app.use(express.static('public'));
+    this.app.use('/static', serveStatic(path.join(__dirname, 'public')) as any);
     this.app.use(express.json());
   }
   

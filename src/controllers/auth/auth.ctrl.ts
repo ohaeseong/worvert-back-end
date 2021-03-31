@@ -149,6 +149,67 @@ export class AuthCtrl {
     }
   };
 
+  public loginWIthGithubForMobile = async (req: AuthRequest, res: Response) => {
+    const { github_token } = req.body;
+
+    if (!github_token) {
+      res.status(400).json({
+        status: 400,
+        message: '요청 오류!',
+      });
+
+      return;
+    }
+
+    try {
+      const { data } = await axios.get('https://api.github.com/user', {
+        headers: {
+          Authorization: `token ${github_token}`,
+        },
+      });
+
+      const { login, id, avatar_url, name } = data;
+
+      const member = await this.authService.findUserById(id);
+      let userInfo;
+
+      if (!member) {
+        const memberData = {
+          memberId: id,
+          pw: 'no needs password',
+          accessLevel: 1,
+          memberName: name,
+          profileImage: avatar_url,
+        };
+
+        userInfo = await this.authService.createUserWithGithub(memberData);
+      } else {
+        userInfo = member;
+      }
+
+      const token = await tokenLib.createToken(id, 1, avatar_url);
+      
+      delete userInfo.pw;
+
+      res.status(200).json({
+        status: 200,
+        message: '깃헙 로그인 성공! (Mobile)',
+        data: {
+          token,
+          member: { ...userInfo },
+        },
+      });
+
+    } catch (error) {
+      colorConsole.error(error);
+
+      res.status(500).json({
+        status: 500,
+        message: '서버 에러',
+      });
+    }
+  }
+
   public registerAccount = async (req: AuthRequest, res: Response) => {
     const { body } = req;
 
