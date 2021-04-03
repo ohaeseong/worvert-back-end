@@ -99,11 +99,14 @@ export class AuthCtrl {
         },
       });
 
-      const gihubToken = response.data.access_token;
+      const githubToken = response.data.access_token;
+
+      console.log(githubToken);
+      
 
       const { data } = await axios.get('https://api.github.com/user', {
         headers: {
-          Authorization: `token ${gihubToken}`,
+          Authorization: `token ${githubToken}`,
         },
       });
 
