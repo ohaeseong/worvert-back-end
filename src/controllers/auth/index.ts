@@ -20,7 +20,9 @@ export class AuthRoute {
 
   // authCtrl의 함수들을 각각 요청 경로에 따라 route 시켜주는 함수
   public setRouter() {
+    this.router.get('/user-info', this.authCtrl.getUserInfo);
     this.router.post('/login', this.authCtrl.login);
+    this.router.post('/register/with-github', this.authCtrl.createUserIdAndNameForGithub);
     this.router.post('/login/with-github', this.authCtrl.loginWithGithub);
     this.router.post('/login/with-github/mobile', this.authCtrl.loginWIthGithubForMobile);
   }

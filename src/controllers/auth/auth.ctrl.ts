@@ -99,10 +99,7 @@ export class AuthCtrl {
         },
       });
 
-      const githubToken = response.data.access_token;
-
-      console.log(githubToken);
-      
+      const githubToken = response.data.access_token;      
 
       const { data } = await axios.get('https://api.github.com/user', {
         headers: {
@@ -110,24 +107,25 @@ export class AuthCtrl {
         },
       });
 
-      const { login, id, avatar_url, name } = data;
+      const { id, avatar_url, login, name } = data;
 
-      const member = await this.authService.findUserById(id);
-      let userInfo;
+      const member = await this.authService.findUserByGithubId(id);
 
       if (!member) {
-        const memberData = {
-          memberId: id,
-          pw: 'no needs password',
-          accessLevel: 1,
-          memberName: name,
-          profileImage: avatar_url,
-        };
-
-        userInfo = await this.authService.createUserWithGithub(memberData);
-      } else {
-        userInfo = member;
+        res.status(404).json({
+          status: 404,
+          message: '첫 로그인 (깃헙으로 가입)!',
+          data: {
+            id,
+            login,
+            name,
+            avatarUrl: avatar_url,
+          }
+        });
+  
+        return;
       }
+      let userInfo = member;
 
       const token = await tokenLib.createToken(id, 1, avatar_url);
       
@@ -142,6 +140,69 @@ export class AuthCtrl {
         },
       });
         
+    } catch (error) {
+      colorConsole.error(error);
+
+      res.status(500).json({
+        status: 500,
+        message: '서버 에러',
+      });
+    }
+  };
+
+  public createUserIdAndNameForGithub = async (req: AuthRequest, res: Response) => {
+    const { memberId, memberName, githubId, avatarUrl, introduce } = req.body;
+
+    console.log(req.body);
+    
+
+    if (!memberId || !memberName || !githubId) {
+      res.status(400).json({
+        status: 400,
+        message: '요청 오류!',
+      });
+
+      return;
+    }
+
+    try {
+      const member = await this.authService.findUserById(memberId);
+
+      if (member) {
+        res.status(409).json({
+          status: 409,
+          message: '중복 아이디!',
+        });
+  
+        return;
+      }
+
+      const memberData = {
+        memberId,
+        githubId,
+        pw: 'no needs password',
+        accessLevel: 1,
+        memberName,
+        introduce,
+        profileImage: avatarUrl,
+      };
+
+      const memberCreateData = await this.authService.createUserWithGithub(memberData);
+
+      let userInfo = memberCreateData;
+
+      const token = await tokenLib.createToken(memberId, 1, avatarUrl);
+      
+      delete userInfo.pw;
+
+      res.status(200).json({
+        status: 200,
+        message: '깃헙 로그인 성공!',
+        data: {
+          token,
+          member: { ...userInfo },
+        },
+      });
     } catch (error) {
       colorConsole.error(error);
 
@@ -229,6 +290,42 @@ export class AuthCtrl {
 
     try {
 
+    } catch (error) {
+      colorConsole.error(error);
+
+      res.status(500).json({
+        status: 500,
+        message: '서버 에러',
+      });
+    }
+  };
+
+  public getUserInfo = async (req: AuthRequest, res: Response) => {
+    colorConsole.info('[GET] get user info by member id ');
+    const memberId: string  = req.query.memberId as string;
+    console.log(memberId);
+    
+    if (!memberId) {
+      res.status(400).json({
+        status: 400,
+        message: '요청 오류!',
+      });
+
+      return;
+    }
+
+    try {
+      const member = await this.authService.findUserById(memberId);
+
+      delete member.pw;
+      
+      res.status(200).json({
+        status: 200,
+        message: '사용자 정보 조회 성공',
+        data: {
+          ...member
+        },
+      });
     } catch (error) {
       colorConsole.error(error);
 
