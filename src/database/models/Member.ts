@@ -10,6 +10,9 @@ export class Member extends BaseEntity {
   @PrimaryColumn({ type: 'varchar', length: 50, unique: true })
   memberId: string;
 
+  @Column({ type: 'varchar', length: 50, unique: true, nullable: true })
+  githubId: string;
+
   @Column({ type: 'varchar', length: 50 })
   memberName: string;
 

@@ -34,6 +34,16 @@ export class AuthService {
     return member;
   };
 
+  public async findUserByGithubId(id: string) {
+    const member = await this.memberRepo.findOne({
+      where: {
+        githubId: id,
+      },
+    });
+
+    return member;
+  };
+
   public async createUserWithGithub(memberData: MemberData) {
     const member = await this.memberRepo.save({
       ...memberData,
