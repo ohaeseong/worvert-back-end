@@ -29,4 +29,12 @@ export class PostTagService {
 
     return tag;
   }
+
+  public async deleteAllTags(postId: string) {
+    const tags = await this.tagRepo.delete({
+        postId,
+    });
+
+    return tags;
+  }
 }
