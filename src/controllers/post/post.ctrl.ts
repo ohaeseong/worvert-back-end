@@ -21,6 +21,7 @@ export class PostCtrl {
     private commentService: PostCommentService,
     private likeService: PostLikeService,
     private tagService: PostTagService,
+    private postTagService: PostTagService,
     private replyCommentService: PostReplyCommentService,
   ) { }
   
@@ -306,7 +307,7 @@ export class PostCtrl {
 
     try {
       const { memberId } = decoded;
-      const { title, contents } = body;
+      const { title, contents, tags } = body;
       
       const id: string = await generatedId();
       
@@ -319,6 +320,10 @@ export class PostCtrl {
 
       // DB에 저장하는 함수를 실행합니다.
       const post = await this.postService.createPost(postFormData);
+
+      await asyncForeach(tags, async (tagName: string) => {
+        await this.postTagService.addTag(post.id, tagName);
+      });
 
       res.status(200).json({
         status: 200,
@@ -356,7 +361,7 @@ export class PostCtrl {
     }
 
     try {
-      const { id, title, contents, thumbnailAddress } = body;
+      const { id, title, contents, thumbnailAddress, tags } = body;
       
       const post = await this.postService.getPostForDiscrimination(id, decoded.memberId);
       
@@ -371,6 +376,12 @@ export class PostCtrl {
 
       // 요청받은 게시글 id를 기준으로 데이터를 업데이트하는 함수입니다.
       await this.postService.updatePostByIdx(id, title, contents, thumbnailAddress);
+
+      await this.postTagService.deleteAllTags(id);
+
+      await asyncForeach(tags, async (tagName: string) => {
+        await this.postTagService.addTag(id, tagName);
+      });
 
       res.status(200).json({
         status: 200,

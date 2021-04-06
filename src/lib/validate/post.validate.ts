@@ -5,6 +5,7 @@ export const writePostValidate = (body: Object) => {
     const schema = Joi.object().keys({
       title: Joi.string().max(50).required(),
       contents: Joi.string().required(),
+      tags: Joi.array().allow(null),
       // category: Joi.string().required(),
       // series: Joi.string().allow(null).allow(''),
       // kinds: Joi.string().required(),
@@ -20,6 +21,7 @@ export const updatePostValidate = (body: Object) => {
       id: Joi.string().required(),
       title: Joi.string().max(50).required(),
       contents: Joi.string().required(),
+      tags: Joi.array().allow(null),
       thumbnailAddress: Joi.string().allow(null).allow(''),
     });
   
