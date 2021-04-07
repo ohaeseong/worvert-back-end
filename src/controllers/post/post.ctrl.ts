@@ -99,24 +99,24 @@ export class PostCtrl {
     // 게시글 리스트 멤버별 조회 함수
   public getPostsByMemberId = async (req: AuthRequest, res: Response) => {
       colorConsole.info('[GET] post list lookup by memberId');
-      const { memberId } = req.decoded;
-      const limit: string  = req.query.limit as string;
+      const memberId: string  = req.query.memberId as string;
+      // const limit: string  = req.query.limit as string;
   
       // limit, page의 요청 방식이 올바른지 확인 하는 코드입니다.
-      if (!limit || parseInt(limit) < 0) {
+      if (!memberId) {
             res.status(400).json({
               status: 400,
               message: '양식이 맞지 않아요!'
             });
   
             return
-          }
+      }
   
       try {
         
         
         // DB에 있는 데이터를 조회 합니다.
-        const posts = await this.postService.getPostsByMemberId(memberId, parseInt(limit));
+        const posts = await this.postService.getPostsByMemberId(memberId);
         // const allPosts = await this.postService.getAllPostDataByCategory(category); 
         
         // const totalPage = Math.ceil(allPosts.length / parseInt(limit, 10));
@@ -321,9 +321,11 @@ export class PostCtrl {
       // DB에 저장하는 함수를 실행합니다.
       const post = await this.postService.createPost(postFormData);
 
-      await asyncForeach(tags, async (tagName: string) => {
-        await this.postTagService.addTag(post.id, tagName);
-      });
+      if (tags) {
+        await asyncForeach(tags, async (tagName: string) => {
+          await this.postTagService.addTag(post.id, tagName);
+        });
+      }
 
       res.status(200).json({
         status: 200,

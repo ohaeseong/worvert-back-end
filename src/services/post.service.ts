@@ -52,7 +52,7 @@ export class PostService {
     return posts;
   }
 
-  public async getPostsByMemberId(memberId: string, limit: number) {
+  public async getPostsByMemberId(memberId: string) {
 
     // posts member별 조회
     const posts = await this.postRepo.find({
@@ -63,8 +63,6 @@ export class PostService {
       order: {
         createTime: "DESC"
       },
-      skip: 0,
-      take: limit,
     });
 
     return posts;
