@@ -127,7 +127,7 @@ export class AuthCtrl {
       }
       let userInfo = member;
 
-      const token = await tokenLib.createToken(id, 1, avatar_url);
+      const token = await tokenLib.createToken(userInfo.memberId, 1, avatar_url);
       
       delete userInfo.pw;
 
@@ -303,7 +303,6 @@ export class AuthCtrl {
   public getUserInfo = async (req: AuthRequest, res: Response) => {
     colorConsole.info('[GET] get user info by member id ');
     const memberId: string  = req.query.memberId as string;
-    console.log(memberId);
     
     if (!memberId) {
       res.status(400).json({
@@ -316,6 +315,13 @@ export class AuthCtrl {
 
     try {
       const member = await this.authService.findUserById(memberId);
+
+      if (!member) {
+        res.status(404).json({
+          status: 404,
+          message: '사용자 정보 없음',
+        });
+      }
 
       delete member.pw;
       
