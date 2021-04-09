@@ -14,7 +14,7 @@ export class TemporaryCtrl {
 
     public getTemporaryPostList = async (req: AuthRequest, res: Response) => {
         colorConsole.info('[GET] get temporary post list ');
-        const { memberId } = req.decoded;
+        const memberId: string  = req.query.memberId as string;
 
         if (!memberId) {
             res.status(400).json({
@@ -26,9 +26,14 @@ export class TemporaryCtrl {
         }
 
         try {
+            const posts = await this.postService.getPostsByMemberId(memberId, 0);
+
             res.status(200).json({
                 status: 200,
                 message: 'get temporary posts!',
+                data: {
+                    posts,
+                }
             });
         } catch (error) {
             colorConsole.error(error);

@@ -41,6 +41,7 @@ export class PostService {
       where: {
         category,
         kinds,
+        state: 1,
       },
       order: {
         createTime: "DESC"
@@ -52,13 +53,14 @@ export class PostService {
     return posts;
   }
 
-  public async getPostsByMemberId(memberId: string) {
+  public async getPostsByMemberId(memberId: string, state: number) {
 
     // posts member별 조회
     const posts = await this.postRepo.find({
       relations:['member', 'comments'],
       where: {
         memberId,
+        state,
       },
       order: {
         createTime: "DESC"

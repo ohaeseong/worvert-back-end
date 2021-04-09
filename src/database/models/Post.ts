@@ -1,4 +1,5 @@
 import { Entity, BaseEntity, Column, PrimaryColumn, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
+import { BookMark } from './BookMark';
 import { Comment } from './Comment';
 import { Like } from './Like';
 import { Member } from './Member';
@@ -63,6 +64,12 @@ export class Post extends BaseEntity {
     (tag) => tag.post, { nullable: true },
   )
   tags!: Tag[];
+
+  @OneToMany(
+    (type) => BookMark,
+    (bookmark) => bookmark.post, { nullable: true },
+  )
+  bookmarks!: Tag[];
 
   @ManyToOne(
     (type) => Member,
