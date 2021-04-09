@@ -96,8 +96,75 @@ export class PostCtrl {
     }
   };
 
-    // 게시글 리스트 멤버별 조회 함수
-  public getPostsByMemberId = async (req: AuthRequest, res: Response) => {
+    // 사용자 별 북마크 표시 게시글, 임시저장 게시글, 비공개 게시글 조회
+  public getPostsByState = async (req: AuthRequest, res: Response) => {
+      colorConsole.info('[GET] post list lookup by state');
+      const state: string  = req.query.state as string;
+      const memberId: string  = req.query.memberId as string;
+  
+      // limit, page의 요청 방식이 올바른지 확인 하는 코드입니다.
+      if (!state) {
+            res.status(400).json({
+              status: 400,
+              message: '양식이 맞지 않아요!'
+            });
+  
+            return
+      }
+  
+      try {
+        
+        // DB에 있는 데이터를 조회 합니다.
+        const posts = await this.postService.getPostsByMemberId(memberId, parseInt(state));
+        // const allPosts = await this.postService.getAllPostDataByCategory(category); 
+        
+        // const totalPage = Math.ceil(allPosts.length / parseInt(limit, 10));
+  
+        await asyncForeach(posts, async (post: PostDetail) => {
+          // const commentData = await this.commentService.getPostCommentListAll(post.id);
+          const likeData = await this.likeService.getAllLikeByPostId(post.id);
+          
+          // post.commentList = commentData.length;
+          post.like = likeData.length;
+  
+          delete post.member.pw;
+          delete post.member.accessLevel;
+        });
+  
+        await asyncForeach(posts, async (post: PostDetail) => {
+          let replyComments;
+          if (post.comments) {
+            post.commentCount = post.comments.length;
+          }
+          for(let i = 0; i < post.comments.length; i++) {
+            const comment = post.comments[i];
+            replyComments = await this.replyCommentService.getCommentByReplyCommentIdx(comment.idx);
+    
+            if (replyComments) {
+              post.commentCount = post.commentCount + replyComments.length;
+            }
+          }
+        
+        });
+        
+  
+        res.status(200).json({
+          status: 200,
+          message: '게시글 조회 성공',
+          data: {
+            posts,
+          }
+        });
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({
+          status: 500,
+          message: '게시글 조회 실패!'
+        });
+      }
+    };
+
+    public getPostsByMemberId = async (req: AuthRequest, res: Response) => {
       colorConsole.info('[GET] post list lookup by memberId');
       const memberId: string  = req.query.memberId as string;
       // const limit: string  = req.query.limit as string;
@@ -116,7 +183,7 @@ export class PostCtrl {
         
         
         // DB에 있는 데이터를 조회 합니다.
-        const posts = await this.postService.getPostsByMemberId(memberId);
+        const posts = await this.postService.getPostsByMemberId(memberId, 1);
         // const allPosts = await this.postService.getAllPostDataByCategory(category); 
         
         // const totalPage = Math.ceil(allPosts.length / parseInt(limit, 10));

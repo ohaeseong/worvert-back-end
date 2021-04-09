@@ -20,7 +20,7 @@ export class TemporaryRoute {
     };
 
     setRouter() {
-        this.router.get('/', authMiddleWare, this.temporaryCtrl.getTemporaryPostList);
+        this.router.get('/', this.temporaryCtrl.getTemporaryPostList);
     }
 
     public getRouter() {
