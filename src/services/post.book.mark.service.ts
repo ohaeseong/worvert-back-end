@@ -50,4 +50,15 @@ export class BookMarkService {
       return posts;
   }
 
+  public async checkMemberBookmark(memberId: string, postId: string) {
+    const bookmark = await this.bookmarkRepo.findOne({
+        where: {
+          memberId,
+          postId,
+        },
+      });
+  
+      return bookmark;
+  }
+
 }

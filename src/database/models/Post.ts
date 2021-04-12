@@ -23,7 +23,7 @@ export class Post extends BaseEntity {
   @Column({ type: 'varchar', nullable: true })
   series: string;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', unique: true, nullable: true })
   url: string;
 
   @Column({ type: 'varchar', nullable: true })

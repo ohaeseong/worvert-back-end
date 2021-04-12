@@ -15,8 +15,7 @@ export class BookMarkCtrl {
     public bookmarkToPost = async (req: AuthRequest, res: Response) => {
         colorConsole.info('[POST] bookmark to post api call ');
         const { memberId } = req.decoded;
-        const { postId  } = req.body;
-
+        const { postId } = req.body;
 
         try {
             const post = await this.postService.getPostById(postId);
@@ -57,6 +56,37 @@ export class BookMarkCtrl {
             res.status(200).json({
                 status: 200,
                 message: 'canceled bookmark post!',
+            });
+        } catch (error) {
+            colorConsole.error(error);
+
+            res.status(500).json({
+              status: 500,
+              message: '서버 에러',
+            });
+        }
+    }
+
+    public isCheckBookmark = async (req: AuthRequest, res: Response) => {
+        colorConsole.info('[GET] is check bookmark api call ');
+        const memberId = req.query.memberId as string;
+        const postId = req.query.postId as string;
+        
+        try {
+
+            const bookmark = await this.bookmarkService.checkMemberBookmark(memberId, postId);
+            let isBookmark = false;
+            
+            if (bookmark) {
+                isBookmark = true;
+            }
+
+            res.status(200).json({
+                status: 200,
+                message: 'success check! is bookmark',
+                data: {
+                    isBookmark,
+                },
             });
         } catch (error) {
             colorConsole.error(error);

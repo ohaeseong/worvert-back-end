@@ -16,6 +16,7 @@ export class BookmarkRoute {
 
     private setRouter() {
         this.router.post('/', authMiddleWare, this.bookmarkCtrl.bookmarkToPost);
+        this.router.get('/check', this.bookmarkCtrl.isCheckBookmark);
         this.router.get('/', this.bookmarkCtrl.getBookmarkPost);
     }
 

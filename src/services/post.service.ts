@@ -106,6 +106,17 @@ export class PostService {
     return result;
   }
 
+  public async getPostBySlug(slug: string) {
+    const result = await this.postRepo.findOne({
+      relations:['member'],
+      where: {
+        url: slug,
+      }
+    });
+
+    return result;
+  }
+
   // 게시글 작성자 식별을 위한 함수
   public async getPostForDiscrimination(id: string, memberId: string) {
     const result = await this.postRepo.findOne({
@@ -134,6 +145,7 @@ export class PostService {
     }, {
       title,
       contents,
+      state: 0,
       thumbnailAddress,
     });
 

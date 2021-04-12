@@ -1,5 +1,6 @@
 import { Service } from 'typedi';
 import { Response } from 'express';
+import { v4 as uuid4 } from 'uuid';
 import { PostService } from '../../services/post.service';
 import { AuthRequest, PostComment, PostDetail, PostWriteForm } from '../../typings'; 
 import * as Validate  from '../../lib/validate/post.validate';
@@ -232,25 +233,79 @@ export class PostCtrl {
       }
     };
 
-  // 게시글 상세 조회 함수
   public getPostById = async (req: AuthRequest, res: Response) => {
-    colorConsole.info('[GET] post detail data lookup api was called');
+    colorConsole.info('[GET] post detail data lookup api was called (by id) ');
     const id: string  = req.params.id as string;
-    
-    // id의 요청 방식이 올바른지 확인 하는 코드입니다.
     if (!id) {
       res.status(400).json({
         status: 400,
-        message: '양식이 맞지 않아요!'
+        message: '요청 오류!'
       });
 
       return
     }
 
     try {
+      const post: PostDetail = await this.postService.getPostById(id);
+
+      if(!post) {
+        res.status(404).json({
+          status: 404,
+          messgae: '게시글을 찾을 수 없습니다.',
+        });
+
+        return;
+      }
+
+      const tagData = await this.tagService.getTags(post.id);
+
+      post.tagList = {
+        tagData,
+      };
+
+      delete post.member.pw;
+      delete post.member.accessLevel;
+
+      res.status(200).json({
+        status: 200,
+        message: '게시글 조회 성공',
+        data: {
+          post,
+        }
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        status: 500,
+        message: '게시글 조회 실패!'
+      });
+    }
+  };
+
+  // 게시글 상세 조회 함수
+  public getPostByUrlSlug = async (req: AuthRequest, res: Response) => {
+    colorConsole.info('[GET] post detail data lookup api was called (by slug)');
+    const slug: string  = req.query.slug as string;
+    const memberId: string  = req.query.memberId as string;
+    
+    // id의 요청 방식이 올바른지 확인 하는 코드입니다.
+    if (!slug || !memberId) {
+      res.status(400).json({
+        status: 400,
+        message: '요청 오류!'
+      });
+
+      return
+    }
+    
+
+    try {
+      // const splitSlug = slug.split("-");
+      const replaceUrl = `/${memberId}/${slug}`;
+      console.log(replaceUrl);
 
       // DB에 있는 데이터를 조회 합니다.
-      const post: PostDetail = await this.postService.getPostById(id);
+      const post: PostDetail = await this.postService.getPostBySlug(replaceUrl);
 
       if(!post) {
         res.status(404).json({
@@ -304,7 +359,7 @@ export class PostCtrl {
 
       res.status(200).json({
         status: 200,
-        message: '게시글 조회 성공',
+        message: '게시글 조회 성공 (by url)',
         data: {
           post,
         }
@@ -336,7 +391,17 @@ export class PostCtrl {
     }
 
     try {
-      const { id, kinds, thumbnailAddress, category, slugUrl, intro, publishType } = body;
+      const { id, kinds, thumbnailAddress, category, intro, publishType } = body;
+      let { slugUrl } = body;
+
+      const post = await this.postService.getPostBySlug(slugUrl);
+
+      if (post) {
+        let uid: string = uuid4();
+        uid = `-${uid.slice(0, 10)}`;
+        slugUrl = `/${slugUrl.split("/")[1]}/${slugUrl.split("/")[2]}${uid}`;
+        console.log(slugUrl, "test");
+      }
       
       await this.postService.updatePostStatusToPublish(id, kinds, thumbnailAddress, category, slugUrl, intro, publishType);
 
