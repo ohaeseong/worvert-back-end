@@ -30,6 +30,7 @@ export class PostRoute {
     this.router.get('/', this.postCtrl.getPosts);
     this.router.get('/member', this.postCtrl.getPostsByMemberId);
     this.router.get('/detail/:id', this.postCtrl.getPostById);
+    this.router.get('/url', this.postCtrl.getPostByUrlSlug);
     this.router.get('/state', this.postCtrl.getPostsByState);
     this.router.post('/', authMiddleWare, this.postCtrl.writePost);
     this.router.put('/', authMiddleWare, this.postCtrl.updatePost);
