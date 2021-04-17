@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import { AuthService } from "../../services/auth.service";
 import { AuthRequest } from "../../typings";
 import * as Validate from '../../lib/validate/auth.validate';
+import * as emailLib from '../../lib/email';
 import * as tokenLib from '../../lib/token.lib';
 import * as colorConsole from '../../lib/console';
 
@@ -150,10 +151,43 @@ export class AuthCtrl {
     }
   };
 
+  public certificationEmailSend = async (req: AuthRequest, res: Response) => {
+    colorConsole.info('[POST] certification mail send api called');
+    const { body } = req;
+
+    try {
+      await Validate.certificationEmailValidate(body);
+    } catch (error) {
+      res.status(400).json({
+        status: 400,
+        message: 'email validate fail!',
+      });
+
+      return;
+    }
+
+
+    try {
+      const { email } = body;
+
+      await emailLib.sendSignUpLinkEmail(email);
+
+      res.status(200).json({
+        status: 200,
+        message: '이메일 발송 성공!',
+      });
+    } catch (error) {
+      colorConsole.error(error);
+
+      res.status(500).json({
+        status: 500,
+        message: '서버 에러',
+      });
+    }
+  }
+
   public createUserIdAndNameForGithub = async (req: AuthRequest, res: Response) => {
     const { memberId, memberName, githubId, avatarUrl, introduce } = req.body;
-
-    console.log(req.body);
     
 
     if (!memberId || !memberName || !githubId) {
