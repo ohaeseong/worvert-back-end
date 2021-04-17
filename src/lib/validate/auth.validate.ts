@@ -19,3 +19,12 @@ export const registerAccountValidate = (body: Object) => {
 
   return schema.validateAsync(body);
 };
+
+// 사용자 인증 메일 api 요청 값 검사 함수
+export const certificationEmailValidate = (body: Object) => {
+  const schema = Joi.object().keys({
+    email: Joi.string().email().required(),
+  });
+
+  return schema.validateAsync(body);
+};
