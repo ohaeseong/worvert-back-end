@@ -25,6 +25,9 @@ export class Member extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   profileImage: string;
 
+  @Column({ type: 'varchar', nullable: true })
+  email: string;
+
   @Column({ type: 'text', nullable: true })
   introduce: string;
 

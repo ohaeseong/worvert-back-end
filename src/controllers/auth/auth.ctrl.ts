@@ -122,7 +122,7 @@ export class AuthCtrl {
             name,
             avatarUrl: avatar_url,
           }
-        });
+        });                                                                                                                                                                                                                                                                             
   
         return;
       }
@@ -151,7 +151,37 @@ export class AuthCtrl {
     }
   };
 
-  public certificationEmailSend = async (req: AuthRequest, res: Response) => {
+  public loginWithFacebook = async (req: AuthRequest, res: Response) => {
+    colorConsole.info('[POST] facebook login api was called');
+    // const { code } = req.body;
+
+    // if (!code) {
+    //   res.status(400).json({
+    //     status: 400,
+    //     message: '요청 오류!',
+    //   });
+
+    //   return;
+    // }
+
+    try {
+
+      res.status(200).json({
+        status: 200,
+        message: '페이스북 로그인 성공!',
+      });
+        
+    } catch (error) {
+      colorConsole.error(error);
+
+      res.status(500).json({
+        status: 500,
+        message: '서버 에러',
+      });
+    }
+  };
+
+  public signUpEmailSend = async (req: AuthRequest, res: Response) => {
     colorConsole.info('[POST] certification mail send api called');
     const { body } = req;
 
@@ -169,6 +199,17 @@ export class AuthCtrl {
 
     try {
       const { email } = body;
+
+      const member = await this.authService.findUserByEmail(email);
+
+      if (member) {
+        res.status(403).json({
+          status: 403,
+          message: '이미 가압된 계정입니다.',
+        });
+
+        return;
+      }
 
       await emailLib.sendSignUpLinkEmail(email);
 
@@ -365,6 +406,44 @@ export class AuthCtrl {
         data: {
           ...member
         },
+      });
+    } catch (error) {
+      colorConsole.error(error);
+
+      res.status(500).json({
+        status: 500,
+        message: '서버 에러',
+      });
+    }
+  };
+
+  public modifyUserInfo = async (req: AuthRequest, res: Response) => {
+    colorConsole.info('[PUT] modify user info api called');
+    const { body } = req;
+    const { memberId } = req.decoded;
+    
+    try {
+      await Validate.modifyUserInfoValidate(body);
+    } catch (error) {
+      res.status(400).json({
+        status: 400,
+        message: '요청 오류!',
+      });
+
+      return;
+    }
+
+    try {
+      const memberInfo = {
+        ...body,
+        memberId,
+      };
+
+      await this.authService.updateUserInfo(memberInfo);
+      
+      res.status(200).json({
+        status: 200,
+        message: '사용자 정보 수정 성공',
       });
     } catch (error) {
       colorConsole.error(error);

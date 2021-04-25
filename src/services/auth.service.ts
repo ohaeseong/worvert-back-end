@@ -2,7 +2,7 @@ import { Service } from "typedi";
 import { InjectRepository } from "typeorm-typedi-extensions";
 import { Member } from "../database/models/Member";
 import { Repository } from "typeorm";
-import { MemberData } from "../typings";
+import { MemberData, MemberUpdateInfo } from "../typings";
 
 // 의존성 주입 (객체를 인스턴스화 시킬 경우 Service 데코 사용)
 @Service()
@@ -34,6 +34,16 @@ export class AuthService {
     return member;
   };
 
+  public async findUserByEmail(email: string) {
+    const member = await this.memberRepo.findOne({
+      where: {
+        email,
+      },
+    });
+
+    return member;
+  };
+
   public async findUserByGithubId(id: string) {
     const member = await this.memberRepo.findOne({
       where: {
@@ -47,6 +57,16 @@ export class AuthService {
   public async createUserWithGithub(memberData: MemberData) {
     const member = await this.memberRepo.save({
       ...memberData,
+    });
+
+    return member;
+  }
+
+  public async updateUserInfo(memberInfo: MemberUpdateInfo) {
+    const member = await this.memberRepo.update({
+      memberId: memberInfo.memberId
+    }, {
+      ...memberInfo,
     });
 
     return member;

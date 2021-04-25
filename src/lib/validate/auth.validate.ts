@@ -28,3 +28,16 @@ export const certificationEmailValidate = (body: Object) => {
 
   return schema.validateAsync(body);
 };
+
+
+// 사용자 정보 수정 요청값 검사 함수
+export const modifyUserInfoValidate = (body: Object) => {
+  const schema = Joi.object().keys({
+    email: Joi.string().email(),
+    memberName: Joi.string().max(50),
+    profileImage: Joi.string(),
+    introduce: Joi.string(),
+  });
+
+  return schema.validateAsync(body);
+};
