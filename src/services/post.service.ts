@@ -44,7 +44,7 @@ export class PostService {
         state: 1,
       },
       order: {
-        createTime: "DESC"
+        createTime: "DESC",
       },
       skip: 0,
       take: limit,

@@ -398,7 +398,10 @@ export class AuthCtrl {
         });
       }
 
-      delete member.pw;
+      // delete member.pw;
+
+      console.log(member, memberId);
+      
       
       res.status(200).json({
         status: 200,
@@ -444,6 +447,37 @@ export class AuthCtrl {
       res.status(200).json({
         status: 200,
         message: '사용자 정보 수정 성공',
+      });
+    } catch (error) {
+      colorConsole.error(error);
+
+      res.status(500).json({
+        status: 500,
+        message: '서버 에러',
+      });
+    }
+  };
+
+  public modifyUserIntroduce = async (req: AuthRequest, res: Response) => {
+    colorConsole.info('[PUT] modify user intro api called');
+    const { body } = req;
+    const { memberId } = req.decoded;
+    
+    if (!body.introduce || body.introduce.length > 1000) {
+      res.status(400).json({
+        status: 400,
+        message: '요청 오류!',
+      });
+
+      return;
+    }
+
+    try {
+      await this.authService.updateUserIntroduce(body.introduce, memberId);
+      
+      res.status(200).json({
+        status: 200,
+        message: '사용자 소개글 수정 성공',
       });
     } catch (error) {
       colorConsole.error(error);
