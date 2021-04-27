@@ -71,4 +71,14 @@ export class AuthService {
 
     return member;
   }
+
+  public async updateUserIntroduce(introduce: string, memberId: string) {
+    const member = await this.memberRepo.update({
+      memberId,
+    }, {
+      introduce,
+    });
+
+    return member;
+  }
 }

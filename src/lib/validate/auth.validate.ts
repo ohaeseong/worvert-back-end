@@ -36,7 +36,6 @@ export const modifyUserInfoValidate = (body: Object) => {
     email: Joi.string().email(),
     memberName: Joi.string().max(50),
     profileImage: Joi.string(),
-    introduce: Joi.string(),
   });
 
   return schema.validateAsync(body);

@@ -23,6 +23,7 @@ export class AuthRoute {
   public setRouter() {
     this.router.get('/user-info', this.authCtrl.getUserInfo);
     this.router.put('/user-info', authMiddleWare, this.authCtrl.modifyUserInfo);
+    this.router.put('/user-intro', authMiddleWare, this.authCtrl.modifyUserIntroduce);
     this.router.post('/send-email/sign-up', this.authCtrl.signUpEmailSend);
     this.router.post('/login', this.authCtrl.login);
     this.router.post('/register/with-github', this.authCtrl.createUserIdAndNameForGithub);
