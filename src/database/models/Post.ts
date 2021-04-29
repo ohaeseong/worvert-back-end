@@ -1,4 +1,4 @@
-import { Entity, BaseEntity, Column, PrimaryColumn, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, BaseEntity, Column, PrimaryColumn, OneToMany, ManyToOne, JoinColumn, Index } from 'typeorm';
 import { BookMark } from './BookMark';
 import { Comment } from './Comment';
 import { Like } from './Like';
@@ -11,9 +11,11 @@ export class Post extends BaseEntity {
   @PrimaryColumn({ type: 'varchar', length: 100, unique: true })
   id: string;
 
+  @Index({ fulltext: true })
   @Column({ type: 'varchar', length: 50})
   title: string;
 
+  @Index({ fulltext: true })
   @Column({ type: 'text'})
   contents: string;
 
