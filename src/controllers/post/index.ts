@@ -32,6 +32,7 @@ export class PostRoute {
     this.router.get('/detail/:id', this.postCtrl.getPostById);
     this.router.get('/url', this.postCtrl.getPostByUrlSlug);
     this.router.get('/state', this.postCtrl.getPostsByState);
+    this.router.get('/search/memberId', this.postCtrl.searchMemberPosts);
     this.router.post('/', authMiddleWare, this.postCtrl.writePost);
     this.router.put('/', authMiddleWare, this.postCtrl.updatePost);
     this.router.put('/publish', authMiddleWare, this.postCtrl.publishPost);

@@ -11,7 +11,7 @@ import { PostCommentService } from '../../services/post.comment.service';
 import { PostLikeService } from '../../services/post.like.service';
 import { PostTagService } from '../../services/post.tag.service';
 import { PostReplyCommentService } from '../../services/post.reply.comment.service';
-import { Comment } from '../../database/models/Comment';
+import dayjs from 'dayjs';
 
 const { replace } = config;
 
@@ -79,6 +79,22 @@ export class PostCtrl {
       
       });
 
+      let toDay = new Date();
+      const subtractToDay = dayjs(toDay).subtract(14, 'day').format('YYYY-MM-DD');
+      
+
+      posts.sort((a: any, b: any) => {
+        return b.like - a.like;
+      });
+
+
+      for (let i = 0; i < posts.length; i++) {
+        if (subtractToDay > dayjs(posts[i].createTime).format('YYYY-MM-DD')) {
+          posts[posts.length - 1] =  posts[i];
+          posts.splice(i, 1);
+        }
+      }
+
       res.status(200).json({
         status: 200,
         message: '게시글 조회 성공',
@@ -123,19 +139,13 @@ export class PostCtrl {
         await asyncForeach(posts, async (post: PostDetail) => {
           // const commentData = await this.commentService.getPostCommentListAll(post.id);
           const likeData = await this.likeService.getAllLikeByPostId(post.id);
-          
-          // post.commentList = commentData.length;
-          post.like = likeData.length;
-  
-          delete post.member.pw;
-          delete post.member.accessLevel;
-        });
-  
-        await asyncForeach(posts, async (post: PostDetail) => {
+          const tagData = await this.tagService.getTags(post.id);
+
           let replyComments;
           if (post.comments) {
             post.commentCount = post.comments.length;
           }
+
           for(let i = 0; i < post.comments.length; i++) {
             const comment = post.comments[i];
             replyComments = await this.replyCommentService.getCommentByReplyCommentIdx(comment.idx);
@@ -144,10 +154,17 @@ export class PostCtrl {
               post.commentCount = post.commentCount + replyComments.length;
             }
           }
-        
-        });
-        
+          
+          // post.commentList = commentData.length;
+          post.like = likeData.length;
+          post.tagList = {
+            tagData,
+          };
   
+          delete post.member.pw;
+          delete post.member.accessLevel;
+        });
+
         res.status(200).json({
           status: 200,
           message: '게시글 조회 성공',
@@ -191,15 +208,8 @@ export class PostCtrl {
         await asyncForeach(posts, async (post: PostDetail) => {
           // const commentData = await this.commentService.getPostCommentListAll(post.id);
           const likeData = await this.likeService.getAllLikeByPostId(post.id);
-          
-          // post.commentList = commentData.length;
-          post.like = likeData.length;
-  
-          delete post.member.pw;
-          delete post.member.accessLevel;
-        });
-  
-        await asyncForeach(posts, async (post: PostDetail) => {
+          const tagData = await this.tagService.getTags(post.id);
+
           let replyComments;
           if (post.comments) {
             post.commentCount = post.comments.length;
@@ -212,9 +222,15 @@ export class PostCtrl {
               post.commentCount = post.commentCount + replyComments.length;
             }
           }
-        
+          // post.commentList = commentData.length;
+          post.like = likeData.length;
+          post.tagList = {
+            tagData,
+          };
+
+          delete post.member.pw;
+          delete post.member.accessLevel;
         });
-        
   
         res.status(200).json({
           status: 200,
@@ -271,6 +287,39 @@ export class PostCtrl {
         data: {
           post,
         }
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        status: 500,
+        message: '게시글 조회 실패!'
+      });
+    }
+  };
+
+  public searchMemberPosts = async (req: AuthRequest, res: Response) => {
+    colorConsole.info('[GET] search member posts api call ');
+    const memberId: string  = req.query.memberId as string;
+    const searchWord: string  = req.query.searchWord as string;
+    
+    if (!memberId) {
+      res.status(400).json({
+        status: 400,
+        message: '요청 오류!'
+      });
+
+      return
+    }
+
+    try {
+      const posts = await this.postService.getMemberPostsByLike(memberId, searchWord);
+
+      res.status(200).json({
+        status: 200,
+        message: '회원 게시글 검색 성공',
+        data: {
+          posts,
+        },
       });
     } catch (error) {
       console.error(error);

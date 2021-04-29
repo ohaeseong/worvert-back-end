@@ -1,5 +1,5 @@
 import { Service } from 'typedi';
-import { Repository } from 'typeorm';
+import { Repository, Like } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { PostWriteForm } from '../typings';
 
@@ -44,7 +44,7 @@ export class PostService {
         state: 1,
       },
       order: {
-        createTime: "DESC",
+        createTime: "DESC"
       },
       skip: 0,
       take: limit,
@@ -63,6 +63,27 @@ export class PostService {
         state,
       },
       order: {
+        createTime: "DESC"
+      },
+    });
+
+    return posts;
+  }
+
+  public async getMemberPostsByLike(memberId: string, searchWord: string) {
+
+    // posts member별 조회
+    const posts = await this.postRepo.find({
+      relations:['member', 'comments'],
+      where: [{
+        title: Like(`%${searchWord}%`),
+        memberId,
+        state: 1,
+      },{
+        contents: Like(`%${searchWord}%`),
+        memberId,
+        state: 1,
+      }], order: {
         createTime: "DESC"
       },
     });
