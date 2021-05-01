@@ -314,9 +314,99 @@ export class PostCtrl {
     try {
       const posts = await this.postService.getMemberPostsByLike(memberId, searchWord);
 
+      await asyncForeach(posts, async (post: PostDetail) => {
+        // const commentData = await this.commentService.getPostCommentListAll(post.id);
+        const likeData = await this.likeService.getAllLikeByPostId(post.id);
+        const tagData = await this.tagService.getTags(post.id);
+
+        let replyComments;
+        if (post.comments) {
+          post.commentCount = post.comments.length;
+        }
+
+        for(let i = 0; i < post.comments.length; i++) {
+          const comment = post.comments[i];
+          replyComments = await this.replyCommentService.getCommentByReplyCommentIdx(comment.idx);
+  
+          if (replyComments) {
+            post.commentCount = post.commentCount + replyComments.length;
+          }
+        }
+        
+        // post.commentList = commentData.length;
+        post.like = likeData.length;
+        post.tagList = {
+          tagData,
+        };
+
+        delete post.member.pw;
+        delete post.member.accessLevel;
+      });
+
       res.status(200).json({
         status: 200,
         message: '회원 게시글 검색 성공',
+        data: {
+          posts,
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        status: 500,
+        message: '게시글 조회 실패!'
+      });
+    }
+  };
+
+  public searchPosts = async (req: AuthRequest, res: Response) => {
+    colorConsole.info('[GET] search posts api call ');
+    const searchWord: string  = req.query.searchWord as string;
+    
+    if (!searchWord) {
+      res.status(400).json({
+        status: 400,
+        message: '요청 오류!'
+      });
+
+      return
+    }
+
+    try {
+      const posts = await this.postService.getPostsByLike(searchWord);
+
+      await asyncForeach(posts, async (post: PostDetail) => {
+        // const commentData = await this.commentService.getPostCommentListAll(post.id);
+        const likeData = await this.likeService.getAllLikeByPostId(post.id);
+        const tagData = await this.tagService.getTags(post.id);
+
+        let replyComments;
+        if (post.comments) {
+          post.commentCount = post.comments.length;
+        }
+
+        for(let i = 0; i < post.comments.length; i++) {
+          const comment = post.comments[i];
+          replyComments = await this.replyCommentService.getCommentByReplyCommentIdx(comment.idx);
+  
+          if (replyComments) {
+            post.commentCount = post.commentCount + replyComments.length;
+          }
+        }
+        
+        // post.commentList = commentData.length;
+        post.like = likeData.length;
+        post.tagList = {
+          tagData,
+        };
+
+        delete post.member.pw;
+        delete post.member.accessLevel;
+      });
+
+      res.status(200).json({
+        status: 200,
+        message: '게시글 검색 성공',
         data: {
           posts,
         },
@@ -439,7 +529,7 @@ export class PostCtrl {
     }
 
     try {
-      const { id, kinds, thumbnailAddress, category, intro, publishType } = body;
+      const { id, kinds, thumbnailAddress, category, intro, publishType, tags } = body;
       let { slugUrl } = body;
 
       const post = await this.postService.getPostBySlug(slugUrl);
@@ -448,10 +538,15 @@ export class PostCtrl {
         let uid: string = uuid4();
         uid = `-${uid.slice(0, 10)}`;
         slugUrl = `/${slugUrl.split("/")[1]}/${slugUrl.split("/")[2]}${uid}`;
-        console.log(slugUrl, "test");
       }
       
       await this.postService.updatePostStatusToPublish(id, kinds, thumbnailAddress, category, slugUrl, intro, publishType);
+
+      if (tags) {
+        await asyncForeach(tags, async (tagName: string) => {
+          await this.postTagService.addTag(id, tagName);
+        });
+      }
 
       res.status(200).json({
         status: 200,
