@@ -91,6 +91,25 @@ export class PostService {
     return posts;
   }
 
+  public async getPostsByLike(searchWord: string) {
+
+    // posts member별 조회
+    const posts = await this.postRepo.find({
+      relations:['member', 'comments'],
+      where: [{
+        title: Like(`%${searchWord}%`),
+        state: 1,
+      },{
+        contents: Like(`%${searchWord}%`),
+        state: 1,
+      }], order: {
+        createTime: "DESC"
+      },
+    });
+
+    return posts;
+  }
+
   // 게시글 카테고리 별 전체 조회
   public async getAllPostDataByCategory(category: string, kinds: string) {
 

@@ -66,6 +66,7 @@ export const publishPostValidate = (body: Object) => {
     thumbnailAddress: Joi.string().allow(null).allow(''),
     publishType: Joi.number().integer().required(),
     intro: Joi.string().allow(null).allow(''),
+    tags: Joi.array().allow(null),
     category: Joi.string().required(),
     slugUrl: Joi.string().required(),
   });
