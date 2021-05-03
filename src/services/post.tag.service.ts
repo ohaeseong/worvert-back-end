@@ -30,6 +30,19 @@ export class PostTagService {
     return tag;
   }
 
+  public async getPostsByTag(tag: string) {
+
+    // posts member별 조회
+    const posts = await this.tagRepo.find({
+      relations: ['post'],
+      where: {
+        tagName: tag,
+      }
+    });
+
+    return posts;
+  }
+
   public async deleteAllTags(postId: string) {
     const tags = await this.tagRepo.delete({
         postId,
