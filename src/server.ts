@@ -60,7 +60,7 @@ class Server {
         console.log(`[HTTPS] tech-blog Server is started on port ${sslPort}`);
       });
     } catch (error) {
-      console.log('[HTTPS] HTTPS 오류가 발생하였습니다. HTTPS 서버는 실행되지 않습니다.');
+      console.log('[HTTPS] HTTPS 오류가 발생하였습니다. HTTPS 서버는 실행되지 않습니다.', error);
     }
   }
 }
