@@ -51,9 +51,9 @@ class Server {
 
     try {
       const option = {
-        ca: fs.readFileSync('../etc/letsencrypt/live/work-it.co.kr/privkey.pem'),
-        key: fs.readFileSync(path.resolve(process.cwd(), '../etc/letsencrypt/live/work-it.co.kr/fullchain.pem'), 'utf8').toString(),
-        cert: fs.readFileSync(path.resolve(process.cwd(), '../etc/letsencrypt/live/work-it.co.kr/cert.pem'), 'utf8').toString(),
+        ca: fs.readFileSync('../fullchain.pem'),
+        key: fs.readFileSync(path.resolve(process.cwd(), '../privkey.pem'), 'utf8').toString(),
+        cert: fs.readFileSync(path.resolve(process.cwd(), '../cert.pem'), 'utf8').toString(),
       }
 
       HTTPS.createServer(option, this.app).listen(sslPort, () => {

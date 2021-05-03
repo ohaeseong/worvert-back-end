@@ -11,9 +11,9 @@ COPY ormconfig.json ./
 RUN yarn
 
 ADD . /tech-diary-back-end-version2.
-ADD . /etc/letsencrypt/live/work-it.co.kr/privkey.pem
-ADD . /etc/letsencrypt/live/work-it.co.kr/fullchain.pem 
-ADD . /etc/letsencrypt/live/work-it.co.kr/cert.pem
+ADD /etc/letsencrypt/live/work-it.co.kr/privkey.pem .
+ADD /etc/letsencrypt/live/work-it.co.kr/fullchain.pem .
+ADD /etc/letsencrypt/live/work-it.co.kr/cert.pem .
 
 EXPOSE 8888
 
