@@ -379,7 +379,7 @@ export class AuthCtrl {
     colorConsole.info('[GET] get user info by member id ');
     const memberId: string  = req.query.memberId as string;
 
-    if (memberId === 'favicon.ico' || memberId === 'undefined') return;
+    // if (memberId === 'favicon.ico' || memberId === 'undefined') return;
 
     if (!memberId) {
       res.status(400).json({

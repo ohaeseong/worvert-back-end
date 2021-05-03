@@ -3,7 +3,7 @@
   "host": "13.125.130.198",
   "port": 3306,
   "username": "root",
-  "password": "gotjd@0419",
+  "password": "gotjd0419",
   "database": "tech-diary",
   "entities": [
       "src/database/models/*.ts"
