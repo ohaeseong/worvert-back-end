@@ -7,7 +7,6 @@ import serveStatic from 'serve-static';
 import RootRouter from './controllers';
 import connectDB from './database/connection';
 import Container from 'typedi';
-import '../'
 import fs from 'fs';
 
 
