@@ -420,6 +420,72 @@ export class PostCtrl {
     }
   };
 
+  public searchTagPosts = async (req: AuthRequest, res: Response) => {
+    colorConsole.info('[GET] search tag posts api call ');
+    const tag: string  = req.query.tag as string;
+    
+    if (!tag) {
+      res.status(400).json({
+        status: 400,
+        message: '요청 오류!'
+      });
+
+      return
+    }
+
+    try {
+      const posts = await this.tagService.getPostsByTag(tag);
+      const publicPosts: any = [];
+
+      await asyncForeach(posts, async (post: PostDetail) => {
+        // const commentData = await this.commentService.getPostCommentListAll(post.id);
+        // const likeData = await this.likeService.getAllLikeByPostId(post.id);
+        const tagData = await this.tagService.getTags(post.id);
+
+        // let replyComments;
+        // if (post.comments) {
+        //   post.commentCount = post.comments.length;
+        // }
+
+        // for(let i = 0; i < post.comments.length; i++) {
+        //   const comment = post.comments[i];
+        //   replyComments = await this.replyCommentService.getCommentByReplyCommentIdx(comment.idx);
+  
+        //   if (replyComments) {
+        //     post.commentCount = post.commentCount + replyComments.length;
+        //   }
+        // }
+        
+        // post.commentList = commentData.length;
+        // post.like = likeData.length;
+        post.tagList = {
+          tagData,
+        };
+      });
+
+      posts.forEach(postData => {
+        if (postData.post.state === 1) {
+          publicPosts.push(postData);
+        }
+      });
+      
+
+      res.status(200).json({
+        status: 200,
+        message: '게시글 태그 검색 성공',
+        data: {
+          posts: publicPosts,
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        status: 500,
+        message: '게시글 조회 실패!'
+      });
+    }
+  };
+
   // 게시글 상세 조회 함수
   public getPostByUrlSlug = async (req: AuthRequest, res: Response) => {
     colorConsole.info('[GET] post detail data lookup api was called (by slug)');

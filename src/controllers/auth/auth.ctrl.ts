@@ -400,8 +400,11 @@ export class AuthCtrl {
         });
       }
 
-      delete member.pw;
-      delete member.accessLevel;
+      if (member) {
+        delete member.pw;
+        delete member.accessLevel;
+      }
+
       
       res.status(200).json({
         status: 200,
