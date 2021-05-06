@@ -378,7 +378,8 @@ export class AuthCtrl {
   public getUserInfo = async (req: AuthRequest, res: Response) => {
     colorConsole.info('[GET] get user info by member id ');
     const memberId: string  = req.query.memberId as string;
-
+    console.log(memberId);
+    
     // if (memberId === 'favicon.ico' || memberId === 'undefined') return;
 
     if (!memberId) {
@@ -428,18 +429,32 @@ export class AuthCtrl {
     const { body } = req;
     const { memberId } = req.decoded;
     
-    try {
-      await Validate.modifyUserInfoValidate(body);
-    } catch (error) {
-      res.status(400).json({
-        status: 400,
-        message: '요청 오류!',
-      });
+    // try {
+    //   await Validate.modifyUserInfoValidate(body);
+    // } catch (error) {
+    //   res.status(400).json({
+    //     status: 400,
+    //     message: '요청 오류!',
+    //   });
 
-      return;
-    }
+    //   return;
+    // }
 
     try {
+
+      const { profileImage, memberName, email } = body;
+
+      if (profileImage && !memberName && !email) {
+        await this.authService.updateUserProfileImage(memberId, profileImage);
+      
+        res.status(200).json({
+          status: 200,
+          message: '사용자 정보 수정 성공 (이미지)',
+        });
+
+        return;
+      }
+
       const memberInfo = {
         ...body,
         memberId,
