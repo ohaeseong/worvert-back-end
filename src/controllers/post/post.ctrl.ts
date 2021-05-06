@@ -437,10 +437,16 @@ export class PostCtrl {
       const posts = await this.tagService.getPostsByTag(tag);
       const publicPosts: any = [];
 
-      await asyncForeach(posts, async (post: PostDetail) => {
+      await asyncForeach(posts, async (post: any) => {
+        // post = {
+        //   tagName: post.tagName,
+        //   ...post.post,
+        // };
         // const commentData = await this.commentService.getPostCommentListAll(post.id);
         // const likeData = await this.likeService.getAllLikeByPostId(post.id);
-        const tagData = await this.tagService.getTags(post.id);
+        const tagData = await this.tagService.getTags(post.postId);
+        // console.log(post.postId);
+        
 
         // let replyComments;
         // if (post.comments) {
@@ -458,6 +464,8 @@ export class PostCtrl {
         
         // post.commentList = commentData.length;
         // post.like = likeData.length;
+        // console.log(post);
+        
         post.tagList = {
           tagData,
         };
@@ -599,14 +607,17 @@ export class PostCtrl {
       let { slugUrl } = body;
 
       const post = await this.postService.getPostBySlug(slugUrl);
+      
 
-      if (post) {
+      if (post && id !== post.id) {
         let uid: string = uuid4();
         uid = `-${uid.slice(0, 10)}`;
         slugUrl = `/${slugUrl.split("/")[1]}/${slugUrl.split("/")[2]}${uid}`;
       }
       
       await this.postService.updatePostStatusToPublish(id, kinds, thumbnailAddress, category, slugUrl, intro, publishType);
+
+      await this.postTagService.deleteAllTags(id);
 
       if (tags) {
         await asyncForeach(tags, async (tagName: string) => {
@@ -706,6 +717,7 @@ export class PostCtrl {
     try {
       const { id, title, contents, thumbnailAddress, tags } = body;
       
+      
       const post = await this.postService.getPostForDiscrimination(id, decoded.memberId);
       
       if(!post) {
@@ -716,6 +728,7 @@ export class PostCtrl {
 
         return;
       }
+      
 
       // 요청받은 게시글 id를 기준으로 데이터를 업데이트하는 함수입니다.
       await this.postService.updatePostByIdx(id, title, contents, thumbnailAddress);

@@ -34,8 +34,8 @@ export const certificationEmailValidate = (body: Object) => {
 export const modifyUserInfoValidate = (body: Object) => {
   const schema = Joi.object().keys({
     email: Joi.string().email().allow('').allow(null),
-    memberName: Joi.string().max(50),
-    profileImage: Joi.string(),
+    memberName: Joi.string().max(50).allow(null),
+    profileImage: Joi.string().allow(null),
   });
 
   return schema.validateAsync(body);

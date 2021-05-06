@@ -72,6 +72,17 @@ export class AuthService {
     return member;
   }
 
+
+  public async updateUserProfileImage(memberId: string, profileImage: string) {
+    const member = await this.memberRepo.update({
+      memberId,
+    }, {
+      profileImage,
+    });
+
+    return member;
+  }
+
   public async updateUserIntroduce(introduce: string, memberId: string) {
     const member = await this.memberRepo.update({
       memberId,
