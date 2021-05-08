@@ -29,6 +29,18 @@ export const certificationEmailValidate = (body: Object) => {
   return schema.validateAsync(body);
 };
 
+// 사용자 인증 메일 api 요청 값 검사 함수
+export const registerUser = (body: Object) => {
+  const schema = Joi.object().keys({
+    memberId: Joi.string().max(50).required(),
+    pw: Joi.string().max(500).required(),
+    memberName: Joi.string().max(50).required(),
+    intro: Joi.string().max(1000).allow(null).allow(''),
+  });
+
+  return schema.validateAsync(body);
+};
+
 
 // 사용자 정보 수정 요청값 검사 함수
 export const modifyUserInfoValidate = (body: Object) => {
