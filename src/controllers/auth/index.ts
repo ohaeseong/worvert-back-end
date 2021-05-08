@@ -27,6 +27,7 @@ export class AuthRoute {
     this.router.post('/send-email/sign-up', this.authCtrl.signUpEmailSend);
     this.router.post('/login', this.authCtrl.login);
     this.router.post('/register/with-github', this.authCtrl.createUserIdAndNameForGithub);
+    this.router.post('/register', this.authCtrl.registerAccount);
     this.router.post('/login/with-github', this.authCtrl.loginWithGithub);
     this.router.post('/login/with-github/mobile', this.authCtrl.loginWIthGithubForMobile);
     this.router.post('/login/with-facebook', this.authCtrl.loginWithFacebook);

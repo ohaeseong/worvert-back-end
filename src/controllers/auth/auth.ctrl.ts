@@ -353,18 +353,45 @@ export class AuthCtrl {
     const { body } = req;
 
     try {
-
+      await Validate.registerUser(body);
     } catch (error) {
       res.status(400).json({
         status: 400,
-        message: '요청 오류!',
+        message: '요청 오류',
       });
 
       return;
     }
 
-    try {
 
+    try {
+      const { memberId } = body;
+
+      const member = await this.authService.findUserById(memberId);
+
+      if (member) {
+        res.status(403).json({
+          status: 403,
+          message: '이미 존재하는 id 입니다.',
+        });
+  
+        return;
+      }
+
+      const userInfo = await this.authService.createUser(body);
+
+      const token = await tokenLib.createToken(memberId, 1, );
+
+      delete userInfo.pw;
+
+      res.status(200).json({
+        status: 200,
+        message: '사용자 정보 저장 성공',
+        data: {
+          token,
+          member: { ...member },
+        },
+      });
     } catch (error) {
       colorConsole.error(error);
 

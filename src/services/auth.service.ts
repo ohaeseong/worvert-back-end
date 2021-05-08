@@ -62,6 +62,15 @@ export class AuthService {
     return member;
   }
 
+  public async createUser(memberData: MemberData) {
+    const member = await this.memberRepo.save({
+      ...memberData,
+      accessLevel: 1,
+    });
+
+    return member;
+  }
+
   public async updateUserInfo(memberInfo: MemberUpdateInfo) {
     const member = await this.memberRepo.update({
       memberId: memberInfo.memberId
