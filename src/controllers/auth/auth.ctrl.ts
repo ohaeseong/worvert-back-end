@@ -9,6 +9,11 @@ import * as Validate from '../../lib/validate/auth.validate';
 import * as emailLib from '../../lib/email';
 import * as tokenLib from '../../lib/token.lib';
 import * as colorConsole from '../../lib/console';
+import { decodeCode } from '../../lib/method.lib';
+
+import config from '../../../config';
+
+const { emailCodeKey } = config;
 
 dotenv.config();
 
@@ -350,8 +355,10 @@ export class AuthCtrl {
   }
 
   public registerAccount = async (req: AuthRequest, res: Response) => {
+    console.log('[POST] register account api called');
+    
     const { body } = req;
-
+    
     try {
       await Validate.registerUser(body);
     } catch (error) {
@@ -378,6 +385,23 @@ export class AuthCtrl {
         return;
       }
 
+      const decodedCode = await decodeCode(body.code);
+
+      const emailCode = decodedCode.split('/')[0];
+      const email = decodedCode.split('/')[1];
+      
+      if (emailCode !== emailCodeKey) {
+        res.status(401).json({
+          status: 401,
+          message: '잘못된 접근',
+        });
+  
+        return;
+      }
+      
+
+      body.email = email;
+      
       const userInfo = await this.authService.createUser(body);
 
       const token = await tokenLib.createToken(memberId, 1, );
@@ -389,7 +413,7 @@ export class AuthCtrl {
         message: '사용자 정보 저장 성공',
         data: {
           token,
-          member: { ...member },
+          member: { ...userInfo },
         },
       });
     } catch (error) {
