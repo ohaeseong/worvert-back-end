@@ -35,6 +35,7 @@ export const registerUser = (body: Object) => {
     memberId: Joi.string().max(50).required(),
     pw: Joi.string().max(500).required(),
     memberName: Joi.string().max(50).required(),
+    code: Joi.string().required(),
     intro: Joi.string().max(1000).allow(null).allow(''),
   });
 

@@ -1,5 +1,8 @@
 import { v4 as uuid4 } from 'uuid';
 import Crypto from 'crypto-js';
+import config from '../../config';
+
+const { cryptoSecret } = config;
 
 // 파일 이름 생성 시 사용하는 uuid 생성 함수
 export const generatedId = () => {
@@ -18,9 +21,10 @@ export const asyncForeach = async (array: any[], callback: any) => {
 };
 
 export const encodingCode = (code: string) => {
-  return Crypto.AES.encrypt(code, 'testKey').toString();
+  return Crypto.AES.encrypt(code, cryptoSecret).toString();
 };
 
 export const decodeCode = (encodingCode: string) => {
-  return Crypto.AES.decrypt(encodingCode, 'testKey').toString();
+  const bytes = Crypto.AES.decrypt(encodingCode, cryptoSecret);
+  return bytes.toString(Crypto.enc.Utf8);
 }

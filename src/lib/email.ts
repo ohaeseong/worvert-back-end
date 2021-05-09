@@ -1,12 +1,15 @@
 import nodeMailer from 'nodemailer';
 import * as Method from './method.lib';
-// import inLineCss from 'nodemailer-juice';
+import config from '../../config';
 
-const createEmailCode = () => {
-    const min = Math.ceil(12340);
-    const max = Math.floor(99999);
-    return Math.floor(Math.random() * (max - min)) + min;
-  };
+const { emailCodeKey } = config;
+
+// import inLineCss from 'nodemailer-juice';
+// const createEmailCode = () => {
+//     const min = Math.ceil(12340);
+//     const max = Math.floor(99999);
+//     return Math.floor(Math.random() * (max - min)) + min;
+//   };
   
 
 export const sendSignUpLinkEmail = (email: string) => {
@@ -24,9 +27,8 @@ export const sendSignUpLinkEmail = (email: string) => {
 
     // transporter.use('compile', inLineCss());
 
-    const code = createEmailCode();
 
-    const encodingCode = Method.encodingCode(code.toString());
+    const encodingCode = Method.encodingCode(`${emailCodeKey.toString()}/${email}`);
 
     const mailOption = {
         from: 'gotjd2720@gmail.com',
