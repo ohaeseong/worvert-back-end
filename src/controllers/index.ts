@@ -5,6 +5,7 @@ import { PostRoute } from './post';
 import { AuthRoute } from './auth';
 import { TokenRoute } from './token';
 import { UploadRoute } from './upload';
+import { SocialRoute } from './social';
 
 @Service() 
 class RootRouter {
@@ -17,6 +18,7 @@ class RootRouter {
 
   private setRouter() {
     this.router.use('/post', Container.get(PostRoute).getRouter());
+    this.router.use('/social', Container.get(SocialRoute).getRouter());
     this.router.use('/auth', Container.get(AuthRoute).getRouter());
     this.router.use('/upload', Container.get(UploadRoute).getRouter());
     this.router.use('/token', Container.get(TokenRoute).getRouter());
