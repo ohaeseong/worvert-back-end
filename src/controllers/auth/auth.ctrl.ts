@@ -12,6 +12,7 @@ import * as colorConsole from '../../lib/console';
 import { decodeCode } from '../../lib/method.lib';
 
 import config from '../../../config';
+import { SocialService } from '../../services/social.service';
 
 const { emailCodeKey } = config;
 
@@ -21,6 +22,7 @@ dotenv.config();
 export class AuthCtrl {
   constructor(
     private authService: AuthService,
+    private socialService: SocialService,
   ) { }
 
   // 사용자 로그인 함수
@@ -452,17 +454,25 @@ export class AuthCtrl {
         });
       }
 
+      const followers = await this.socialService.findFollowers(memberId);
+      const followings = await this.socialService.findFollowings(memberId);
+
       if (member) {
         delete member.pw;
         delete member.accessLevel;
       }
 
+      const userInfo = {
+        ...member,
+        followers: followers.length,
+        followings: followings.length,
+      }
       
       res.status(200).json({
         status: 200,
         message: '사용자 정보 조회 성공',
         data: {
-          ...member
+          ...userInfo
         },
       });
     } catch (error) {

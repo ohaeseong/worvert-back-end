@@ -12,7 +12,7 @@ export class SocialService {
   ) { }
 
 
-  // memberId, pw로 회원 검색
+  // follower 추가
   public async followMember(memberId: string, followingMember: string) {
     const member = await this.socialRepo.save({
         memberId,
@@ -21,6 +21,42 @@ export class SocialService {
 
     return member;
   };
+
+  public async findFollowMember(memberId: string, followingMember: string) {
+    const member = await this.socialRepo.findOne({
+        memberId,
+        following: followingMember,
+    });
+
+    return member;
+  };
+  
+
+  public async findFollowers(memberId: string) {
+    const member = await this.socialRepo.find({
+        following: memberId,
+    });
+
+    return member;
+  };
+
+  public async findFollowings(memberId: string) {
+    const member = await this.socialRepo.find({
+        memberId,
+    });
+
+    return member;
+  };
+
+  public async unFollowMember(memberId: string, followingMember: string) {
+    const member = await this.socialRepo.delete({
+        memberId,
+        following: followingMember,
+    });
+
+    return member;
+  };
+
 
 //   public async unFollowMember()
 
