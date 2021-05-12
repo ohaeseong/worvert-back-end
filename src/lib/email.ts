@@ -2,7 +2,7 @@ import nodeMailer from 'nodemailer';
 import * as Method from './method.lib';
 import config from '../../config';
 
-const { emailCodeKey } = config;
+const { emailCodeKey, clientUrl } = config;
 
 // import inLineCss from 'nodemailer-juice';
 // const createEmailCode = () => {
@@ -29,14 +29,14 @@ export const sendSignUpLinkEmail = (email: string) => {
 
 
     const encodingCode = Method.encodingCode(`${emailCodeKey.toString()}/${email}`);
-
+    
     const mailOption = {
         from: 'gotjd2720@gmail.com',
         to: email,
-        subject: 'Tech-Diary에 오신걸 환영합니다!',
+        subject: 'Work-It에 오신걸 환영합니다!',
         html: `
-            <h1>Tech-Diary 가입 메일</h1>
-            <a href="http://localhost:3000/signup?code=${encodingCode}">http://localhost:3000/sign-up?code=${encodingCode}</a>
+            <h1>Work-It 가입 메일</h1>
+            <a href="${clientUrl}/signup?code=${encodingCode}">${clientUrl}/sign-up?code=${encodingCode}</a>
         `,
     };
 
