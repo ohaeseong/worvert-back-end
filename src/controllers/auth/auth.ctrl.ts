@@ -400,8 +400,31 @@ export class AuthCtrl {
   
         return;
       }
+
       
 
+      const memberByEmail = await this.authService.findUserByEmail(email);
+
+      if (memberByEmail) {
+        const token = await tokenLib.createToken(memberId, 1, );
+
+        delete memberByEmail.pw;
+        delete memberByEmail.accessLevel;
+
+        res.status(200).json({
+          status: 200,
+          message: '토큰 발급 성공',
+          data: {
+            token,
+            member: { ...memberByEmail },
+          },
+        });
+
+        return;
+      }
+      
+
+      body.displayEmail = email;
       body.email = email;
       
       const userInfo = await this.authService.createUser(body);
@@ -409,6 +432,7 @@ export class AuthCtrl {
       const token = await tokenLib.createToken(memberId, 1, );
 
       delete userInfo.pw;
+      delete userInfo.accessLevel;
 
       res.status(200).json({
         status: 200,
@@ -515,6 +539,10 @@ export class AuthCtrl {
 
         return;
       }
+
+      body.displayEmail = email;
+
+      delete body.email;
 
       const memberInfo = {
         ...body,
