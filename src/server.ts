@@ -51,7 +51,7 @@ class Server {
 
     try {
       const option = {
-        ca: fs.readFileSync('../work-it.co.kr/fullchain.pem'),
+        ca: fs.readFileSync(path.resolve(process.cwd(), '../work-it.co.kr/fullchain.pem'), 'utf8').toString(),
         key: fs.readFileSync(path.resolve(process.cwd(), '../work-it.co.kr/privkey.pem'), 'utf8').toString(),
         cert: fs.readFileSync(path.resolve(process.cwd(), '../work-it.co.kr/cert.pem'), 'utf8').toString(),
       }
