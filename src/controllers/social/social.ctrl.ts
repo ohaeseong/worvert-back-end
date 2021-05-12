@@ -1,9 +1,11 @@
 import { Response } from 'express';
 import { Service } from "typedi";
-import { AuthRequest } from '../../typings';
+import { AuthRequest, SocialMemberListTypes } from '../../typings';
 import * as colorConsole from '../../lib/console';
 import { SocialService } from '../../services/social.service';
 import { AuthService } from '../../services/auth.service';
+import { asyncForeach } from '../../lib/method.lib';
+import { Social } from '../../database/models/Social';
 
 @Service()
 export class SocialCtrl {
@@ -44,10 +46,12 @@ export class SocialCtrl {
             
             if (member) {
                 await this.socialService.unFollowMember(memberId, followMemberId);
+                const memberList = await this.socialService.findFollowings(memberId);
 
                 res.status(200).json({
                     status: 200,
                     message: 'follow 취소 신청 완료',
+                    followInfo: memberList,
                 });
 
                 return;
@@ -83,13 +87,38 @@ export class SocialCtrl {
         }
 
         try {
-            let memberList;
+            let memberList: SocialMemberListTypes[];
             if (type === "follower") {
                 memberList = await this.socialService.findFollowers(memberId);
+                const followingMemberList = await this.socialService.findFollowings(memberId);
+
+                memberList.forEach((member) => {
+                    console.log(member.memberId);
+                    
+                    for (let i = 0; i < followingMemberList.length; i++) {
+                        if (member.memberId === followingMemberList[i].following) {
+                            // member = null;
+                            member.isFollow = true;
+                            
+                        }
+                        
+                    }
+                })
             } else if (type === "following") {
                 memberList = await this.socialService.findFollowings(memberId);
+                
+                await asyncForeach(memberList, async (member: any) => {
+                    const memberData = await this.authService.findUserById(member.following);
+                    member.member = {
+                        ...memberData
+                    };
+                });
             }
             
+            memberList.forEach((member) => {
+                delete member.member.pw;
+                delete member.member.accessLevel;
+            });
 
             res.status(200).json({
                 status: 200,

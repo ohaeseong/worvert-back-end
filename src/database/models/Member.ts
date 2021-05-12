@@ -3,6 +3,7 @@ import { Comment } from "./Comment";
 import { Like } from "./Like";
 import { Post } from "./Post";
 import { ReplyComment } from "./ReplyComment";
+import { Social } from "./Social";
 
 // 사용자, 멤버 모델
 @Entity()
@@ -28,8 +29,14 @@ export class Member extends BaseEntity {
   @Column({ type: 'varchar', nullable: true })
   email: string;
 
+  @Column({ type: 'varchar', nullable: true })
+  displayEmail: string;
+
   @Column({ type: 'text', nullable: true })
   introduce: string;
+
+  @Column({ type: 'varchar', nullable: true, length: 500 })
+  introduceLight: string;
 
   @OneToMany(
     (type) => Post,
@@ -50,6 +57,17 @@ export class Member extends BaseEntity {
   )
   replyComments: ReplyComment[];
 
+  @OneToMany(
+    (type) => Social,
+    (social) => social.memberId,
+  )
+  social: Social[];
+
+  @OneToMany(
+    (type) => Social,
+    (social) => social.followingMember,
+  )
+  following: Social[];
 
   @OneToMany(
     (type) => Like,

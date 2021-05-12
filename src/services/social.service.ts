@@ -32,9 +32,12 @@ export class SocialService {
   };
   
 
-  public async findFollowers(memberId: string) {
+  public async findFollowers(following: string) {
     const member = await this.socialRepo.find({
-        following: memberId,
+        relations: ['member'],
+        where: {
+          following,
+        },
     });
 
     return member;
@@ -42,7 +45,10 @@ export class SocialService {
 
   public async findFollowings(memberId: string) {
     const member = await this.socialRepo.find({
-        memberId,
+        // relations: ['member'],
+        where: {
+          memberId,
+        },
     });
 
     return member;

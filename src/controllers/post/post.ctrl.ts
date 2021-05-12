@@ -12,6 +12,7 @@ import { PostLikeService } from '../../services/post.like.service';
 import { PostTagService } from '../../services/post.tag.service';
 import { PostReplyCommentService } from '../../services/post.reply.comment.service';
 import dayjs from 'dayjs';
+import { SocialService } from '../../services/social.service';
 
 const { replace } = config;
 
@@ -24,6 +25,7 @@ export class PostCtrl {
     private tagService: PostTagService,
     private postTagService: PostTagService,
     private replyCommentService: PostReplyCommentService,
+    private socialService: SocialService,
   ) { }
   
   // 게시글 리스트 조회 함수
@@ -556,6 +558,7 @@ export class PostCtrl {
 
       const likeData = await this.likeService.getAllLikeByPostId(post.id);
       const tagData = await this.tagService.getTags(post.id);
+      const followers = await this.socialService.findFollowers(post.memberId);
 
       post.commentList = {
         commentData,
@@ -564,6 +567,8 @@ export class PostCtrl {
       post.tagList = {
         tagData,
       };
+
+      post.followers = followers;
 
       post.commentCount = commentCount;
 

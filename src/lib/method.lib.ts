@@ -21,10 +21,14 @@ export const asyncForeach = async (array: any[], callback: any) => {
 };
 
 export const encodingCode = (code: string) => {
-  return Crypto.AES.encrypt(code, cryptoSecret).toString();
+  return Crypto.AES.encrypt(JSON.stringify({ code }), cryptoSecret).toString();
 };
 
 export const decodeCode = (encodingCode: string) => {
-  const bytes = Crypto.AES.decrypt(encodingCode, cryptoSecret);
-  return bytes.toString(Crypto.enc.Utf8);
+  encodingCode = encodingCode.replace(" ", "+");
+  
+  const bytes = Crypto.AES.decrypt(encodingCode, cryptoSecret).toString(Crypto.enc.Utf8);
+  
+  
+  return JSON.parse(bytes).code;
 }

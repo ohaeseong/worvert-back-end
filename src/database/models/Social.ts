@@ -23,6 +23,7 @@ export class Social extends BaseEntity {
     @JoinColumn({
       name: 'memberId'
     })
+    member!: Member;
 
     @ManyToOne(
       (type) => Member,
@@ -31,5 +32,5 @@ export class Social extends BaseEntity {
     @JoinColumn({
       name: 'following'
     })
-    member: Member;
+    followingMember!: Member;
 }
