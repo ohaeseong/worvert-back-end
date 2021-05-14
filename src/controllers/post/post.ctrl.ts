@@ -7,6 +7,7 @@ import * as Validate  from '../../lib/validate/post.validate';
 import { asyncForeach, generatedId } from '../../lib/method.lib';
 import * as colorConsole from '../../lib/console';
 import config from '../../../config';
+import * as emailLib from '../../lib/email';
 import { PostCommentService } from '../../services/post.comment.service';
 import { PostLikeService } from '../../services/post.like.service';
 import { PostTagService } from '../../services/post.tag.service';
@@ -629,6 +630,12 @@ export class PostCtrl {
           await this.postTagService.addTag(id, tagName);
         });
       }
+
+      const followers = await this.socialService.findFollowers(post.memberId);
+
+      followers.forEach((member) => {
+        emailLib.sendPublishPostInfoToFollowers(member.member.displayEmail, post.url, post.memberId);
+      });
 
       res.status(200).json({
         status: 200,
