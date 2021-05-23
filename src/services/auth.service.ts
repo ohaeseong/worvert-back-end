@@ -44,10 +44,10 @@ export class AuthService {
     return member;
   };
 
-  public async findUserByGithubId(id: string) {
+  public async findUserBySocialId(id: string) {
     const member = await this.memberRepo.findOne({
       where: {
-        githubId: id,
+        socialId: id,
       },
     });
 
