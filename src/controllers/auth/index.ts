@@ -24,13 +24,22 @@ export class AuthRoute {
     this.router.get('/user-info', this.authCtrl.getUserInfo);
     this.router.put('/user-info', authMiddleWare, this.authCtrl.modifyUserInfo);
     this.router.put('/user-intro', authMiddleWare, this.authCtrl.modifyUserIntroduce);
+
     this.router.post('/send-email/sign-up', this.authCtrl.signUpEmailSend);
-    this.router.post('/login', this.authCtrl.login);
-    this.router.post('/register/with-github', this.authCtrl.createUserIdAndNameForGithub);
+    this.router.post('/register/with-social', this.authCtrl.createUserIdAndNameForSocial);
     this.router.post('/register', this.authCtrl.registerAccount);
-    this.router.post('/login/with-github', this.authCtrl.loginWithGithub);
-    this.router.post('/login/with-github/mobile', this.authCtrl.loginWIthGithubForMobile);
-    this.router.post('/login/with-facebook', this.authCtrl.loginWithFacebook);
+
+    this.router.post('/login', this.authCtrl.login);
+
+    this.router.get('/redirect/social', this.authCtrl.socialLogin);
+    this.router.get('/callback/github', this.authCtrl.redirectCallbackGithub);
+    this.router.post('/login/with-github/mobile', this.authCtrl.loginWithGithubForMobile);
+    this.router.post('/callback/facebook', this.authCtrl.loginWithFacebook);
+
+    this.router.use((req, res, next) => {
+      res.header('Access-Control-Allow-Origin', '*');
+      next();
+    });
   }
 
   // authRouter 값 리턴 함수 (외부에서 router  접근이 가능 하도록 만든 함수)

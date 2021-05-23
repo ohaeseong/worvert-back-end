@@ -12,7 +12,7 @@ export class Member extends BaseEntity {
   memberId: string;
 
   @Column({ type: 'varchar', length: 50, unique: true, nullable: true })
-  githubId: string;
+  socialId: string;
 
   @Column({ type: 'varchar', length: 50 })
   memberName: string;

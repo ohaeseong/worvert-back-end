@@ -13,6 +13,7 @@ import { decodeCode } from '../../lib/method.lib';
 
 import config from '../../../config';
 import { SocialService } from '../../services/social.service';
+import { onLoginWithSocialService } from '../../lib/social';
 
 const { emailCodeKey } = config;
 
@@ -83,9 +84,37 @@ export class AuthCtrl {
     }
   };
 
-  public loginWithGithub = async (req: AuthRequest, res: Response) => {
+  public socialLogin = async (req: AuthRequest, res: Response) => {
+    colorConsole.info('[POST] social login redirect request api called');
+    const social: string  = req.query.social as string;
+    const redirectUri: string  = req.query.redirectUri as string;
+
+    if (!social || !redirectUri) {
+      res.status(400).json({
+        status: 400,
+        message: '잘못 된 요청!',
+      });
+
+      return;
+    }
+
+    try {
+      const socialRedirect = onLoginWithSocialService(social, redirectUri);
+
+      res.redirect(socialRedirect);
+    } catch (error) {
+      colorConsole.error(error);
+
+      res.status(500).json({
+        status: 500,
+        message: '서버 에러',
+      });
+    }
+  }
+
+  public redirectCallbackGithub = async (req: AuthRequest, res: Response) => {
     colorConsole.info('[POST] github login api was called');
-    const { code } = req.body;
+    const { code } = req.query;
 
     if (!code) {
       res.status(400).json({
@@ -117,7 +146,7 @@ export class AuthCtrl {
 
       const { id, avatar_url, login, name } = data;
 
-      const member = await this.authService.findUserByGithubId(id);
+      const member = await this.authService.findUserBySocialId(id);
 
       if (!member) {
         res.status(404).json({
@@ -160,22 +189,48 @@ export class AuthCtrl {
 
   public loginWithFacebook = async (req: AuthRequest, res: Response) => {
     colorConsole.info('[POST] facebook login api was called');
-    // const { code } = req.body;
+    const { userName, accessToken, userID } = req.body;
 
-    // if (!code) {
-    //   res.status(400).json({
-    //     status: 400,
-    //     message: '요청 오류!',
-    //   });
+    if (!userID || !userName || !accessToken) {
+      res.status(400).json({
+        status: 400,
+        message: '요청 오류!',
+      });
 
-    //   return;
-    // }
+      return;
+    }
 
     try {
+      let response: any = await axios.get(`https://graph.facebook.com/v10.0/${userID}/picture?access_token=${accessToken}`);
+      const profileImage = response.request.res.responseUrl;
+      const member = await this.authService.findUserBySocialId(userID);
 
+      if (!member) {
+        res.status(404).json({
+          status: 404,
+          message: '첫 로그인 (페이스북으로 가입)!',
+          data: {
+            id: userID,
+            name: userName,
+            profileImage,
+          }
+        });                                                                                                                                                                                                                                                                             
+  
+        return;
+      }
+      let userInfo = member;
+
+      const token = await tokenLib.createToken(userInfo.memberId, 1, profileImage);
+      
+      delete userInfo.pw;
+      
       res.status(200).json({
         status: 200,
         message: '페이스북 로그인 성공!',
+        data: {
+          token,
+          member: { ...userInfo },
+        }
       });
         
     } catch (error) {
@@ -234,11 +289,11 @@ export class AuthCtrl {
     }
   }
 
-  public createUserIdAndNameForGithub = async (req: AuthRequest, res: Response) => {
-    const { memberId, memberName, githubId, avatarUrl, introduce } = req.body;
+  public createUserIdAndNameForSocial = async (req: AuthRequest, res: Response) => {
+    const { memberId, memberName, socialId, profileImage, introduce } = req.body;
     
 
-    if (!memberId || !memberName || !githubId) {
+    if (!memberId || !memberName || !socialId) {
       res.status(400).json({
         status: 400,
         message: '요청 오류!',
@@ -261,25 +316,25 @@ export class AuthCtrl {
 
       const memberData = {
         memberId,
-        githubId,
+        socialId,
         pw: 'no needs password',
         accessLevel: 1,
         memberName,
         introduce,
-        profileImage: avatarUrl,
+        profileImage,
       };
 
       const memberCreateData = await this.authService.createUserWithGithub(memberData);
 
       let userInfo = memberCreateData;
 
-      const token = await tokenLib.createToken(memberId, 1, avatarUrl);
+      const token = await tokenLib.createToken(memberId, 1, profileImage);
       
       delete userInfo.pw;
 
       res.status(200).json({
         status: 200,
-        message: '깃헙 로그인 성공!',
+        message: '소샬 로그인 성공!',
         data: {
           token,
           member: { ...userInfo },
@@ -295,7 +350,67 @@ export class AuthCtrl {
     }
   };
 
-  public loginWIthGithubForMobile = async (req: AuthRequest, res: Response) => {
+  public createUserWithFacebookInfo = async (req: AuthRequest, res: Response) => {
+    const { memberId, memberName, facebookUserId, profileImage, introduce } = req.body;
+    
+    if (!memberId || !memberName || !facebookUserId) {
+      res.status(400).json({
+        status: 400,
+        message: '요청 오류!',
+      });
+
+      return;
+    }
+
+    try {
+      const member = await this.authService.findUserById(memberId);
+
+      if (member) {
+        res.status(409).json({
+          status: 409,
+          message: '중복 아이디!',
+        });
+  
+        return;
+      }
+
+      const memberData = {
+        memberId,
+        facebookUserId,
+        pw: 'no needs password',
+        accessLevel: 1,
+        memberName,
+        introduce,
+        profileImage,
+      };
+
+      const memberCreateData = await this.authService.createUserWithGithub(memberData);
+
+      let userInfo = memberCreateData;
+
+      const token = await tokenLib.createToken(memberId, 1, profileImage);
+      
+      delete userInfo.pw;
+
+      res.status(200).json({
+        status: 200,
+        message: '페이스북 로그인 성공!',
+        data: {
+          token,
+          member: { ...userInfo },
+        },
+      });
+    } catch (error) {
+      colorConsole.error(error);
+
+      res.status(500).json({
+        status: 500,
+        message: '서버 에러',
+      });
+    }
+  };
+
+  public loginWithGithubForMobile = async (req: AuthRequest, res: Response) => {
     const { github_token } = req.body;
 
     if (!github_token) {
