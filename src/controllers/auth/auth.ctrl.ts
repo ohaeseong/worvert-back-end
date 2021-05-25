@@ -14,6 +14,7 @@ import { decodeCode } from '../../lib/method.lib';
 import config from '../../../config';
 import { SocialService } from '../../services/social.service';
 import { onLoginWithSocialService } from '../../lib/social';
+import { setUserInfoCookie, removeUserCookie } from '../../lib/cookie';
 
 const { emailCodeKey } = config;
 
@@ -61,7 +62,7 @@ export class AuthCtrl {
 
       // 토큰 발급
       const token = await tokenLib.createToken(memberId, member.accessLevel, member.profileImage);
-      const refreshToken = await tokenLib.createRefreshToken(memberId);
+      const refreshToken = await tokenLib.createRefreshToken(memberId, member.accessLevel, member.profileImage);
 
       delete member.pw;
 
@@ -84,7 +85,28 @@ export class AuthCtrl {
     }
   };
 
-  public socialLogin = async (req: AuthRequest, res: Response) => {
+  public logout = async (req: AuthRequest, res: Response) => {
+    colorConsole.info('[POST] user logout api was called');
+
+    try {
+      
+      res.clearCookie('access_token', {domain: '.work-it.co.kr', path: '/'});
+
+      res.status(200).json({
+        status: 200,
+        message: '로그아웃 성공!',
+      });
+    } catch (error) {
+      colorConsole.error(error);
+
+      res.status(500).json({
+        status: 500,
+        message: '서버 에러',
+      });
+    }
+  };
+
+  public socialRedirect = async (req: AuthRequest, res: Response) => {
     colorConsole.info('[POST] social login redirect request api called');
     const social: string  = req.query.social as string;
     const redirectUri: string  = req.query.redirectUri as string;
@@ -101,7 +123,7 @@ export class AuthCtrl {
     try {
       const socialRedirect = onLoginWithSocialService(social, redirectUri);
 
-      res.redirect(socialRedirect);
+      res.redirect(encodeURI(socialRedirect));
     } catch (error) {
       colorConsole.error(error);
 
@@ -113,7 +135,7 @@ export class AuthCtrl {
   }
 
   public redirectCallbackGithub = async (req: AuthRequest, res: Response) => {
-    colorConsole.info('[POST] github login api was called');
+    colorConsole.info('[POST] github login api callback');
     const { code } = req.query;
 
     if (!code) {
@@ -149,33 +171,28 @@ export class AuthCtrl {
       const member = await this.authService.findUserBySocialId(id);
 
       if (!member) {
-        res.status(404).json({
-          status: 404,
-          message: '첫 로그인 (깃헙으로 가입)!',
-          data: {
-            id,
-            login,
-            name,
-            avatarUrl: avatar_url,
-          }
-        });                                                                                                                                                                                                                                                                             
-  
+        const memberName = name || ' ';
+        const redirectUrl = `http://localhost:3000/register/${login}?member_name=${memberName}&social_id=${id}&profile_image=${avatar_url}`;
+
+        res.redirect(encodeURI(redirectUrl));                                                                                                                                                                                                                                                 
         return;
       }
       let userInfo = member;
 
       const token = await tokenLib.createToken(userInfo.memberId, 1, avatar_url);
+      const refreshToken = await tokenLib.createRefreshToken(userInfo.memberId, 1, avatar_url);
       
-      delete userInfo.pw;
+      const tokens = {
+        accessToken: token,
+        refreshToken
+      }
 
-      res.status(200).json({
-        status: 200,
-        message: '깃헙 로그인 성공!',
-        data: {
-          token,
-          member: { ...userInfo },
-        },
-      });
+      delete userInfo.pw;
+      setUserInfoCookie(res, tokens, userInfo.memberId);
+
+      const redirectUrl = "http://localhost:3000";
+
+      res.redirect(encodeURI(redirectUrl));
         
     } catch (error) {
       colorConsole.error(error);
@@ -323,6 +340,9 @@ export class AuthCtrl {
         introduce,
         profileImage,
       };
+
+      console.log(socialId);
+      
 
       const memberCreateData = await this.authService.createUserWithGithub(memberData);
 

@@ -11,7 +11,7 @@ export const createToken = (memberId: string, accessLevel: number, profileImage?
     accessLevel,
   };
 
-  const option = { issuer: 'tech-diary.com', subject: 'token' };
+  const option = { expiresIn: '5 days', issuer: 'work-it.co.kr', subject: 'token' };
 
   try {
     return jwt.sign(payload, jwtSecret, option);
@@ -21,12 +21,14 @@ export const createToken = (memberId: string, accessLevel: number, profileImage?
 };
 
 // refreshToken 생성
-export const createRefreshToken = (memberId: string) => {
+export const createRefreshToken = (memberId: string, accessLevel: number, profileImage?: string) => {
   const payload = {
     memberId,
+    profileImage,
+    accessLevel,
   };
 
-  const option = { expiresIn: '7 days', issuer: 'tech-diary.com', subject: 'refresh' };
+  const option = { expiresIn: '7 days', issuer: 'work-it.co.kr', subject: 'refresh' };
 
   try {
     return jwt.sign(payload, jwtSecret, option);
