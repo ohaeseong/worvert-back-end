@@ -30,16 +30,12 @@ export class AuthRoute {
     this.router.post('/register', this.authCtrl.registerAccount);
 
     this.router.post('/login', this.authCtrl.login);
+    this.router.post('/logout', this.authCtrl.logout);
 
-    this.router.get('/redirect/social', this.authCtrl.socialLogin);
+    this.router.get('/redirect/social', this.authCtrl.socialRedirect);
     this.router.get('/callback/github', this.authCtrl.redirectCallbackGithub);
-    this.router.post('/login/with-github/mobile', this.authCtrl.loginWithGithubForMobile);
     this.router.post('/callback/facebook', this.authCtrl.loginWithFacebook);
-
-    this.router.use((req, res, next) => {
-      res.header('Access-Control-Allow-Origin', '*');
-      next();
-    });
+    this.router.post('/login/with-github/mobile', this.authCtrl.loginWithGithubForMobile);
   }
 
   // authRouter 값 리턴 함수 (외부에서 router  접근이 가능 하도록 만든 함수)

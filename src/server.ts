@@ -7,6 +7,7 @@ import serveStatic from 'serve-static';
 import RootRouter from './controllers';
 import connectDB from './database/connection';
 import Container from 'typedi';
+import cookieParser from 'cookie-parser';
 import fs from 'fs';
 
 
@@ -29,6 +30,7 @@ class Server {
     this.app.use(cors());
     this.app.use('/static', serveStatic(path.join(__dirname, 'public')) as any);
     this.app.use(express.json());
+    this.app.use(cookieParser());
   }
   
   // server start
