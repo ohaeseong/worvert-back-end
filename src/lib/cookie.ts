@@ -1,9 +1,9 @@
 import { Response } from 'express';
 
-export function setUserInfoCookie(
+export function setTokensCookie(
     res: Response,
     tokens: { accessToken: string; refreshToken: string },
-    memberId: string
+    memberId: string,
   ) {
     // set cookie
     res.cookie('access_token', tokens.accessToken, {
@@ -18,7 +18,7 @@ export function setUserInfoCookie(
       domain: '.work-it.co.kr'
     });
 
-    res.cookie('user_info', memberId, {
+    res.cookie('user_id', memberId, {
       httpOnly: true,
       maxAge: 1000 * 60 * 60,
       domain: '.work-it.co.kr'
@@ -35,9 +35,9 @@ export function setUserInfoCookie(
       maxAge: 1000 * 60 * 60 * 24 * 30
     });
 
-    res.cookie('user_info', memberId, {
+    res.cookie('user_id', memberId, {
       httpOnly: true,
-      maxAge: 1000 * 60 * 60,
+      maxAge: 1000 * 60 * 60 * 24 * 30
     });
 
   }

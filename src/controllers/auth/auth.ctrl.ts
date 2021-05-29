@@ -14,7 +14,7 @@ import { decodeCode } from '../../lib/method.lib';
 import config from '../../../config';
 import { SocialService } from '../../services/social.service';
 import { onLoginWithSocialService } from '../../lib/social';
-import { setUserInfoCookie, removeUserCookie } from '../../lib/cookie';
+import { removeUserCookie, setTokensCookie } from '../../lib/cookie';
 
 const { emailCodeKey } = config;
 
@@ -90,12 +90,11 @@ export class AuthCtrl {
 
     try {
       
-      res.clearCookie('access_token', {domain: '.work-it.co.kr', path: '/'});
+      res.clearCookie('access_token');
+      res.clearCookie('refresh_token');
+      res.clearCookie('user_id');
 
-      res.status(200).json({
-        status: 200,
-        message: '로그아웃 성공!',
-      });
+      res.redirect('http://localhost:3000');
     } catch (error) {
       colorConsole.error(error);
 
@@ -172,9 +171,27 @@ export class AuthCtrl {
 
       if (!member) {
         const memberName = name || ' ';
-        const redirectUrl = `http://localhost:3000/register/${login}?member_name=${memberName}&social_id=${id}&profile_image=${avatar_url}`;
+        const registerTokenInfo = {
+          memberName,
+          socialId: id,
+          profileImage: avatar_url,
+          memberId: login,
+        }
 
-        res.redirect(encodeURI(redirectUrl));                                                                                                                                                                                                                                                 
+        const token = tokenLib.createRegisterToken(registerTokenInfo);
+  
+        res.cookie('register_token', token, {
+          httpOnly: true,
+          maxAge: 1000 * 60 * 60 * 24 * 30,
+          domain: '.work-it.co.kr'
+        });
+
+        res.cookie('register_token', token, {
+          httpOnly: true,
+          maxAge: 1000 * 60 * 60 * 24 * 30,
+        });
+
+        res.redirect(encodeURI(`http://localhost:3000/register/${login}`));                                                                                                                                                                                                          
         return;
       }
       let userInfo = member;
@@ -188,7 +205,7 @@ export class AuthCtrl {
       }
 
       delete userInfo.pw;
-      setUserInfoCookie(res, tokens, userInfo.memberId);
+      setTokensCookie(res, tokens, userInfo.memberId);
 
       const redirectUrl = "http://localhost:3000";
 
@@ -259,6 +276,30 @@ export class AuthCtrl {
       });
     }
   };
+
+  public getSocialProfile = async (req: AuthRequest, res: Response) => {
+    colorConsole.info('[GET] social info api');
+    const registerToken = req.headers['token'] as string;
+    console.log(registerToken);
+    
+    if (!registerToken) { 
+      res.status(401);
+      return;
+    }
+    try {
+      const decoded = await tokenLib.decodedToken(registerToken) as any;
+      console.log(decoded);
+      
+      res.status(200).json({
+        status: 200,
+        message: '소설 프로필 정보 조회 성공!',
+        data: { ...decoded }
+      });
+    } catch (e) {
+      res.status(400);
+      return;
+    }
+  }
 
   public signUpEmailSend = async (req: AuthRequest, res: Response) => {
     colorConsole.info('[POST] certification mail send api called');
@@ -340,9 +381,6 @@ export class AuthCtrl {
         introduce,
         profileImage,
       };
-
-      console.log(socialId);
-      
 
       const memberCreateData = await this.authService.createUserWithGithub(memberData);
 
@@ -542,6 +580,7 @@ export class AuthCtrl {
 
       if (memberByEmail) {
         const token = await tokenLib.createToken(memberId, 1, );
+        const refreshToken = await tokenLib.createRefreshToken(memberId, 1, );
 
         delete memberByEmail.pw;
         delete memberByEmail.accessLevel;
@@ -555,6 +594,15 @@ export class AuthCtrl {
           },
         });
 
+        res.clearCookie('register_token');
+        
+        const tokens = {
+          accessToken: token,
+          refreshToken
+        }
+  
+        setTokensCookie(res, tokens, memberId);
+
         return;
       }
       
@@ -565,9 +613,19 @@ export class AuthCtrl {
       const userInfo = await this.authService.createUser(body);
 
       const token = await tokenLib.createToken(memberId, 1, );
+      const refreshToken = await tokenLib.createRefreshToken(memberId, 1, );
 
       delete userInfo.pw;
       delete userInfo.accessLevel;
+
+      res.clearCookie('register_token');
+
+      const tokens = {
+        accessToken: token,
+        refreshToken
+      }
+
+      setTokensCookie(res, tokens, memberId);
 
       res.status(200).json({
         status: 200,
