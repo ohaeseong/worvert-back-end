@@ -25,6 +25,8 @@ export const encodingCode = (code: string) => {
 };
 
 export const decodeCode = (encodingCode: string) => {
+  console.log(encodingCode);
+  
   encodingCode = encodingCode.replace(" ", "+");
   
   const bytes = Crypto.AES.decrypt(encodingCode, cryptoSecret).toString(Crypto.enc.Utf8);

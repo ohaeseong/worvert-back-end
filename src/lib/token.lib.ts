@@ -3,6 +3,20 @@ import config from '../../config';
 
 const { jwtSecret } = config;
 
+export const createRegisterToken = (tokenInfo: any) => {
+  const payload = {
+    ...tokenInfo
+  };
+
+  const option = { expiresIn: '5 days', issuer: 'work-it.co.kr', subject: 'token' };
+
+  try {
+    return jwt.sign(payload, jwtSecret, option);
+  } catch (error) {
+    throw error;
+  }
+};
+
 // 토큰 생성
 export const createToken = (memberId: string, accessLevel: number, profileImage?: string) => {
   const payload = {
