@@ -64,6 +64,13 @@ export class AuthCtrl {
       const token = await tokenLib.createToken(memberId, member.accessLevel, member.profileImage);
       const refreshToken = await tokenLib.createRefreshToken(memberId, member.accessLevel, member.profileImage);
 
+      const tokens = {
+        accessToken: token,
+        refreshToken
+      }
+
+      setTokensCookie(res, tokens, memberId);
+
       delete member.pw;
 
       res.status(200).json({
@@ -94,7 +101,25 @@ export class AuthCtrl {
       res.clearCookie('refresh_token');
       res.clearCookie('user_id');
 
-      res.redirect('http://localhost:3000');
+      res.redirect(config.clientUrl);
+    } catch (error) {
+      colorConsole.error(error);
+
+      res.status(500).json({
+        status: 500,
+        message: '서버 에러',
+      });
+    }
+  };
+
+  public deleteRegisterTokenCookie = async (req: AuthRequest, res: Response) => {
+    colorConsole.info('[POST] delete register token');
+
+    try {
+      
+      res.clearCookie('register_token');
+
+      res.redirect(config.clientUrl);
     } catch (error) {
       colorConsole.error(error);
 
@@ -191,7 +216,7 @@ export class AuthCtrl {
           maxAge: 1000 * 60 * 60 * 24 * 30,
         });
 
-        res.redirect(encodeURI(`http://localhost:3000/register/${login}`));                                                                                                                                                                                                          
+        res.redirect(encodeURI(`${config.clientUrl}/register/${login}`));                                                                                                                                                                                                          
         return;
       }
       let userInfo = member;
@@ -207,7 +232,7 @@ export class AuthCtrl {
       delete userInfo.pw;
       setTokensCookie(res, tokens, userInfo.memberId);
 
-      const redirectUrl = "http://localhost:3000";
+      const redirectUrl = config.clientUrl;
 
       res.redirect(encodeURI(redirectUrl));
         
@@ -221,51 +246,67 @@ export class AuthCtrl {
     }
   };
 
-  public loginWithFacebook = async (req: AuthRequest, res: Response) => {
+  public redirectCallbackFacebook = async (req: AuthRequest, res: Response) => {
     colorConsole.info('[POST] facebook login api was called');
-    const { userName, accessToken, userID } = req.body;
+    const { code } = req.query;
+    console.log(code);
+    
 
-    if (!userID || !userName || !accessToken) {
-      res.status(400).json({
-        status: 400,
-        message: '요청 오류!',
-      });
+    // if (!userID || !userName || !accessToken) {
+    //   res.status(400).json({
+    //     status: 400,
+    //     message: '요청 오류!',
+    //   });
 
-      return;
-    }
+    //   return;
+    // }
 
     try {
-      let response: any = await axios.get(`https://graph.facebook.com/v10.0/${userID}/picture?access_token=${accessToken}`);
-      const profileImage = response.request.res.responseUrl;
-      const member = await this.authService.findUserBySocialId(userID);
+    //   let response: any = await axios.get(`https://graph.facebook.com/v10.0/${userID}/picture?access_token=${accessToken}`);
+    //   const profileImage = response.request.res.responseUrl;
+    //   const member = await this.authService.findUserBySocialId(userID);
 
-      if (!member) {
-        res.status(404).json({
-          status: 404,
-          message: '첫 로그인 (페이스북으로 가입)!',
-          data: {
-            id: userID,
-            name: userName,
-            profileImage,
-          }
-        });                                                                                                                                                                                                                                                                             
+      // if (!member) {
+      //   const memberName = userName || ' ';
+      //   const registerTokenInfo = {
+      //     memberName,
+      //     socialId: userID,
+      //     profileImage: profileImage,
+      //     memberId: userID,
+      //   }
+
+      //   const token = tokenLib.createRegisterToken(registerTokenInfo);
   
-        return;
-      }
-      let userInfo = member;
+      //   res.cookie('register_token', token, {
+      //     httpOnly: true,
+      //     maxAge: 1000 * 60 * 60 * 24 * 30,
+      //     domain: '.work-it.co.kr'
+      //   });
 
-      const token = await tokenLib.createToken(userInfo.memberId, 1, profileImage);
+      //   res.cookie('register_token', token, {
+      //     httpOnly: true,
+      //     maxAge: 1000 * 60 * 60 * 24 * 30,
+      //   });
+
+      //   res.redirect(encodeURI(`${config.clientUrl}/register/${userID}`));                                                                                                                                                                                                          
+      //   return;                                                                                                                                                                                                                                                                      
+  
+      //   return;
+      // // }
+      // let userInfo = member;
+
+      // const token = await tokenLib.createToken(userInfo.memberId, 1, profileImage);
       
-      delete userInfo.pw;
+      // delete userInfo.pw;
       
-      res.status(200).json({
-        status: 200,
-        message: '페이스북 로그인 성공!',
-        data: {
-          token,
-          member: { ...userInfo },
-        }
-      });
+      // res.status(200).json({
+      //   status: 200,
+      //   message: '페이스북 로그인 성공!',
+      //   data: {
+      //     token,
+      //     member: { ...userInfo },
+      //   }
+      // });
         
     } catch (error) {
       colorConsole.error(error);
@@ -349,7 +390,6 @@ export class AuthCtrl {
 
   public createUserIdAndNameForSocial = async (req: AuthRequest, res: Response) => {
     const { memberId, memberName, socialId, profileImage, introduce } = req.body;
-    
 
     if (!memberId || !memberName || !socialId) {
       res.status(400).json({
@@ -383,12 +423,21 @@ export class AuthCtrl {
       };
 
       const memberCreateData = await this.authService.createUserWithGithub(memberData);
-
+      
       let userInfo = memberCreateData;
 
       const token = await tokenLib.createToken(memberId, 1, profileImage);
+      const refreshToken = await tokenLib.createRefreshToken(memberId, 1, userInfo.profileImage);
+
+      const tokens = {
+        accessToken: token,
+        refreshToken
+      }
+
+      setTokensCookie(res, tokens, memberId);
       
       delete userInfo.pw;
+      delete userInfo.accessLevel;
 
       res.status(200).json({
         status: 200,

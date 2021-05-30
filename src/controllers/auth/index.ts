@@ -31,10 +31,11 @@ export class AuthRoute {
 
     this.router.post('/login', this.authCtrl.login);
     this.router.get('/logout', this.authCtrl.logout);
+    this.router.get('/delete/register_token', this.authCtrl.deleteRegisterTokenCookie);
 
     this.router.get('/redirect/social', this.authCtrl.socialRedirect);
     this.router.get('/callback/github', this.authCtrl.redirectCallbackGithub);
-    this.router.post('/callback/facebook', this.authCtrl.loginWithFacebook);
+    this.router.get('/callback/facebook', this.authCtrl.redirectCallbackFacebook);
 
     this.router.get('/social-profile', this.authCtrl.getSocialProfile);
     this.router.post('/login/with-github/mobile', this.authCtrl.loginWithGithubForMobile);
