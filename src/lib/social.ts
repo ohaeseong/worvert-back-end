@@ -12,8 +12,10 @@ export function onLoginWithSocialService(social: string, redirectUri: string) {
             const requestURI = `${GIT_HUB_LOGIN_URL}client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}`
             return requestURI;
         case "facebook":
-            
-                break;
+            // const state = JSON.stringify({ next });
+            const callbackUri = redirectUri;
+            const FACEBOOK_ID = config.facebookAppId;
+            return `https://www.facebook.com/v11.0/dialog/oauth?client_id=${FACEBOOK_ID}&redirect_uri=${callbackUri}&scope=email,public_profile`;
         case "google":
     
             break;
