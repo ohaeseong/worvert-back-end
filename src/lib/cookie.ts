@@ -6,25 +6,24 @@ export function setTokensCookie(
     memberId: string,
   ) {
     // set cookie
-    res.cookie('access_token', tokens.accessToken, {
-      httpOnly: true,
-      maxAge: 1000 * 60 * 60,
-      domain: '.work-it.co.kr'
-    });
+    // res.cookie('access_token', tokens.accessToken, {
+    //   httpOnly: true,
+    //   maxAge: 1000 * 60 * 60,
+    //   domain: '.work-it.co.kr'
+    // });
   
-    res.cookie('refresh_token', tokens.refreshToken, {
-      httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24 * 30,
-      domain: '.work-it.co.kr'
-    });
+    // res.cookie('refresh_token', tokens.refreshToken, {
+    //   httpOnly: true,
+    //   maxAge: 1000 * 60 * 60 * 24 * 30,
+    //   domain: '.work-it.co.kr'
+    // });
 
-    res.cookie('user_id', memberId, {
-      httpOnly: true,
-      maxAge: 1000 * 60 * 60,
-      domain: '.work-it.co.kr'
-    });
-  
-    // Following codes are for webpack-dev-server proxy
+    // res.cookie('user_id', memberId, {
+    //   httpOnly: true,
+    //   maxAge: 1000 * 60 * 60,
+    //   domain: '.work-it.co.kr'
+    // });
+
     res.cookie('access_token', tokens.accessToken, {
       httpOnly: true,
       maxAge: 1000 * 60 * 60
