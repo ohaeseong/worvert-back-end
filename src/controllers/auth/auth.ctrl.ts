@@ -97,9 +97,9 @@ export class AuthCtrl {
 
     try {
       
-      res.clearCookie('access_token', {path:'/',domain:'work-it.co.kr'});
-      res.clearCookie('refresh_token', {path:'/',domain:'work-it.co.kr'});
-      res.clearCookie('user_id', {path:'/',domain:'work-it.co.kr'});
+      res.clearCookie('access_token');
+      res.clearCookie('refresh_token');
+      res.clearCookie('user_id');
 
       res.redirect(config.clientUrl);
     } catch (error) {
