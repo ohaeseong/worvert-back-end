@@ -1,5 +1,6 @@
 import { Response } from 'express';
 import { Service } from "typedi";
+import qs from 'qs';
 import axios from 'axios';
 import dotenv from 'dotenv';
 
@@ -19,6 +20,12 @@ import { removeUserCookie, setTokensCookie } from '../../lib/cookie';
 const { emailCodeKey } = config;
 
 dotenv.config();
+
+type FacebookTokenResult = {
+  access_token: string;
+  token_type: string;
+  expires_in: string;
+};
 
 @Service()
 export class AuthCtrl {
@@ -252,17 +259,29 @@ export class AuthCtrl {
     console.log(code);
     
 
-    // if (!userID || !userName || !accessToken) {
-    //   res.status(400).json({
-    //     status: 400,
-    //     message: '요청 오류!',
-    //   });
+    if (!code) {
+      res.status(400).json({
+        status: 400,
+        message: '요청 오류!',
+      });
 
-    //   return;
-    // }
+      return;
+    }
 
     try {
-    //   let response: any = await axios.get(`https://graph.facebook.com/v10.0/${userID}/picture?access_token=${accessToken}`);
+      const query = qs.stringify({
+        code,
+        client_id: process.env.FACEBOOK_CLIENT_ID,
+        client_secret: process.env.FACEBOOK_CLIENT_SECRET,
+        redirect_uri: 'https://work-it.co.kr'
+      });
+    
+      const response = await axios.get<FacebookTokenResult>(
+        `https://graph.facebook.com/v4.0/oauth/access_token?${query}`
+      );
+
+      console.log(response);
+      
     //   const profileImage = response.request.res.responseUrl;
     //   const member = await this.authService.findUserBySocialId(userID);
 
