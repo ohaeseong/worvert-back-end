@@ -93,13 +93,13 @@ export class AuthCtrl {
   };
 
   public logout = async (req: AuthRequest, res: Response) => {
-    colorConsole.info('[POST] user logout api was called');
+    colorConsole.info('[GET] user logout api was called');
 
     try {
       
-      res.clearCookie('access_token');
-      res.clearCookie('refresh_token');
-      res.clearCookie('user_id');
+      res.clearCookie('access_token', {path:'/',domain:'.work-it.co.kr'});
+      res.clearCookie('refresh_token', {path:'/',domain:'.work-it.co.kr'});
+      res.clearCookie('user_id', {path:'/',domain:'.work-it.co.kr'});
 
       res.redirect(config.clientUrl);
     } catch (error) {
