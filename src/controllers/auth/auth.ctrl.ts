@@ -270,11 +270,10 @@ export class AuthCtrl {
 
     try {
       const query = qs.stringify({
-        fb_exchange_token: code,
+        code,
         client_id: process.env.FACEBOOK_CLIENT_ID,
         client_secret: process.env.FACEBOOK_CLIENT_SECRET,
         redirect_uri: 'https://work-it.co.kr/',
-        grant_type:'fb_exchange_token'
       });
     
       const response = await axios.get<FacebookTokenResult>(
