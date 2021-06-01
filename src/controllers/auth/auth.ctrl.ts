@@ -273,6 +273,7 @@ export class AuthCtrl {
         fb_exchange_token: code,
         client_id: process.env.FACEBOOK_CLIENT_ID,
         client_secret: process.env.FACEBOOK_CLIENT_SECRET,
+        redirect_uri: 'https://work-it.co.kr',
         grant_type:'fb_exchange_token'
       });
     
