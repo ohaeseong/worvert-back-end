@@ -30,7 +30,9 @@ type FacebookTokenResult = {
 type FacebookProfile = {
   id: string;
   picture: {
-    url: string;
+    data: {
+      url: string;
+    }
   }
   name: string;
   email: string;
@@ -302,7 +304,7 @@ export class AuthCtrl {
 
       const { id, name, picture } = profile.data;
       
-      const profileImage = picture.url;
+      const profileImage = picture.data.url;
       const member = await this.authService.findUserBySocialId(id);
 
       if (!member) {
@@ -310,7 +312,7 @@ export class AuthCtrl {
         const registerTokenInfo = {
           memberName,
           socialId: id,
-          profileImage: profileImage,
+          profileImage,
           memberId: '',
         }
 
