@@ -289,66 +289,62 @@ export class AuthCtrl {
         `https://graph.facebook.com/v4.0/oauth/access_token?${query}`
       );
 
-      const token = response.data.access_token;
+      const accessToken = response.data.access_token;
 
       const profile = await axios.get<FacebookProfile>(
         'https://graph.facebook.com/v4.0/me?fields=id,name,email,picture',
         {
           headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${accessToken}`
           }
         }
-      );
+      );      
 
-      console.log(profile);
-
+      const { id, name, picture } = profile.data;
       
-      
-    //   const profileImage = response.request.res.responseUrl;
-    //   const member = await this.authService.findUserBySocialId(userID);
+      const profileImage = picture.url;
+      const member = await this.authService.findUserBySocialId(id);
 
-      // if (!member) {
-      //   const memberName = userName || ' ';
-      //   const registerTokenInfo = {
-      //     memberName,
-      //     socialId: userID,
-      //     profileImage: profileImage,
-      //     memberId: userID,
-      //   }
+      if (!member) {
+        const memberName = name || ' ';
+        const registerTokenInfo = {
+          memberName,
+          socialId: id,
+          profileImage: profileImage,
+          memberId: '',
+        }
 
-      //   const token = tokenLib.createRegisterToken(registerTokenInfo);
+        const token = tokenLib.createRegisterToken(registerTokenInfo);
   
-      //   res.cookie('register_token', token, {
-      //     httpOnly: true,
-      //     maxAge: 1000 * 60 * 60 * 24 * 30,
-      //     domain: '.work-it.co.kr'
-      //   });
+        res.cookie('register_token', token, {
+          httpOnly: true,
+          maxAge: 1000 * 60 * 60 * 24 * 30,
+          domain: '.work-it.co.kr'
+        });
 
-      //   res.cookie('register_token', token, {
-      //     httpOnly: true,
-      //     maxAge: 1000 * 60 * 60 * 24 * 30,
-      //   });
+        res.cookie('register_token', token, {
+          httpOnly: true,
+          maxAge: 1000 * 60 * 60 * 24 * 30,
+        });
 
-      //   res.redirect(encodeURI(`${config.clientUrl}/register/${userID}`));                                                                                                                                                                                                          
-      //   return;                                                                                                                                                                                                                                                                      
-  
-      //   return;
-      // // }
-      // let userInfo = member;
+        res.redirect(encodeURI(`${config.clientUrl}/register/${id}`));                                                                                                                                                                                                          
+        return;
+      }
+      let userInfo = member;
 
-      // const token = await tokenLib.createToken(userInfo.memberId, 1, profileImage);
+      const token = await tokenLib.createToken(userInfo.memberId, 1, profileImage);
+      const refreshToken = await tokenLib.createRefreshToken(userInfo.memberId, 1, profileImage);
+      const tokens = {
+        accessToken: token,
+        refreshToken
+      }
+
+      delete userInfo.pw;
+      setTokensCookie(res, tokens, userInfo.memberId);
       
-      // delete userInfo.pw;
-      
-      // res.status(200).json({
-      //   status: 200,
-      //   message: '페이스북 로그인 성공!',
-      //   data: {
-      //     token,
-      //     member: { ...userInfo },
-      //   }
-      // });
-        
+      const redirectUrl = config.clientUrl;
+
+      res.redirect(encodeURI(redirectUrl));
     } catch (error) {
       colorConsole.error(error);
 
