@@ -300,11 +300,11 @@ export class AuthCtrl {
             Authorization: `Bearer ${accessToken}`
           }
         }
-      );      
+      );
 
-      const { id, name, picture } = profile.data;
+      const { id, name } = profile.data;
       
-      const profileImage = picture.data.url;
+      const profileImage = `https://graph.facebook.com/v10.0/${id}/picture`;
       const member = await this.authService.findUserBySocialId(id);
 
       if (!member) {
