@@ -36,6 +36,7 @@ export class AuthRoute {
     this.router.get('/redirect/social', this.authCtrl.socialRedirect);
     this.router.get('/callback/github', this.authCtrl.redirectCallbackGithub);
     this.router.get('/callback/facebook', this.authCtrl.redirectCallbackFacebook);
+    this.router.get('/callback/google', this.authCtrl.redirectCallbackGoogle);
 
     this.router.get('/social-profile', this.authCtrl.getSocialProfile);
     this.router.post('/login/with-github/mobile', this.authCtrl.loginWithGithubForMobile);

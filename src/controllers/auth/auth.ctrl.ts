@@ -3,6 +3,7 @@ import { Service } from "typedi";
 import qs from 'qs';
 import axios from 'axios';
 import dotenv from 'dotenv';
+import google from 'googleapis';
 
 import { AuthService } from "../../services/auth.service";
 import { AuthRequest } from "../../typings";
@@ -15,7 +16,7 @@ import { decodeCode } from '../../lib/method.lib';
 import config from '../../../config';
 import { SocialService } from '../../services/social.service';
 import { onLoginWithSocialService } from '../../lib/social';
-import { removeUserCookie, setTokensCookie } from '../../lib/cookie';
+import { setTokensCookie } from '../../lib/cookie';
 
 const { emailCodeKey } = config;
 
@@ -164,7 +165,8 @@ export class AuthCtrl {
 
     try {
       const socialRedirect = onLoginWithSocialService(social, redirectUri);
-
+      console.log(socialRedirect);
+      
       res.redirect(encodeURI(socialRedirect));
     } catch (error) {
       colorConsole.error(error);
@@ -357,10 +359,20 @@ export class AuthCtrl {
     }
   };
 
+  public redirectCallbackGoogle = async (req: AuthRequest, res: Response) => {
+    colorConsole.info('[GET] social google api callback');
+    const { code } = req.query;
+    console.log(code);
+    
+    try {
+    } catch (error) {
+
+    }
+  }
+
   public getSocialProfile = async (req: AuthRequest, res: Response) => {
     colorConsole.info('[GET] social info api');
     const registerToken = req.headers['token'] as string;
-    console.log(registerToken);
     
     if (!registerToken) { 
       res.status(401);

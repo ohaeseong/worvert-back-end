@@ -1,4 +1,5 @@
 import config from '../../config';
+import { google } from 'googleapis';
 
 
 export function onLoginWithSocialService(social: string, redirectUri: string) {
@@ -17,9 +18,20 @@ export function onLoginWithSocialService(social: string, redirectUri: string) {
             const FACEBOOK_ID = config.facebookAppId;
             return `https://www.facebook.com/v11.0/dialog/oauth?client_id=${FACEBOOK_ID}&redirect_uri=${callbackUri}&scope=email,public_profile`;
         case "google":
-    
-            break;
-    
+            console.log(redirectUri);
+            
+            const oauth2Client = new google.auth.OAuth2('812566867088-f0jjr3olrjm1b5d6805phprone5luq0r.apps.googleusercontent.com', 'TXH3PmLc8zNW92Ql2Byhi9VP', redirectUri);
+            
+            const url = oauth2Client.generateAuthUrl({
+              scope: [
+                'https://www.googleapis.com/auth/userinfo.email',
+                'https://www.googleapis.com/auth/userinfo.profile'
+              ],
+            //   state: JSON.stringify({ next })
+            });
+            
+            
+            return url;
         default:
             break;
     }
