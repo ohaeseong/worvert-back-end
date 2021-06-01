@@ -3,7 +3,6 @@ import { Service } from "typedi";
 import qs from 'qs';
 import axios from 'axios';
 import dotenv from 'dotenv';
-import google from 'googleapis';
 
 import { AuthService } from "../../services/auth.service";
 import { AuthRequest } from "../../typings";
