@@ -27,6 +27,15 @@ type FacebookTokenResult = {
   expires_in: string;
 };
 
+type FacebookProfile = {
+  id: string;
+  picture: {
+    url: string;
+  }
+  name: string;
+  email: string;
+}
+
 @Service()
 export class AuthCtrl {
   constructor(
@@ -280,7 +289,20 @@ export class AuthCtrl {
         `https://graph.facebook.com/v4.0/oauth/access_token?${query}`
       );
 
-      console.log(response);
+      const token = response.data.access_token;
+
+      const profile = await axios.get<FacebookProfile>(
+        'https://graph.facebook.com/v4.0/me?fields=id,name,email,picture',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      console.log(profile);
+
+      
       
     //   const profileImage = response.request.res.responseUrl;
     //   const member = await this.authService.findUserBySocialId(userID);
