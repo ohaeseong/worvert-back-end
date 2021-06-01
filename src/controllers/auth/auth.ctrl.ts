@@ -273,14 +273,11 @@ export class AuthCtrl {
         fb_exchange_token: code,
         client_id: process.env.FACEBOOK_CLIENT_ID,
         client_secret: process.env.FACEBOOK_CLIENT_SECRET,
+        grant_type:'fb_exchange_token'
       });
     
       const response = await axios.get<FacebookTokenResult>(
-        `https://graph.facebook.com/v4.0/oauth/access_token?  
-        grant_type=fb_exchange_token&          
-        client_id=${process.env.FACEBOOK_CLIENT_ID}&
-        client_secret=${process.env.FACEBOOK_CLIENT_SECRET}&
-        fb_exchange_token=${code}`
+        `https://graph.facebook.com/v4.0/oauth/access_token?${query}`
       );
 
       console.log(response);
