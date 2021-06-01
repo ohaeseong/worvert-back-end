@@ -594,6 +594,7 @@ export class PostCtrl {
   public publishPost = async (req: AuthRequest, res: Response) => {
     colorConsole.info('[PUT] post publish api was called');
     const { body } = req;
+    const { memberId  } = req.decoded;
 
     try {
       await Validate.publishPostValidate(body);
@@ -621,7 +622,7 @@ export class PostCtrl {
         slugUrl = `/${slugUrl.split("/")[1]}/${slugUrl.split("/")[2]}${uid}`;
       }
       
-      await this.postService.updatePostStatusToPublish(id, kinds, thumbnailAddress, category, slugUrl, intro, publishType);
+      const updatePost = await this.postService.updatePostStatusToPublish(id, kinds, thumbnailAddress, category, slugUrl, intro, publishType);
 
       await this.postTagService.deleteAllTags(id);
 
@@ -631,10 +632,10 @@ export class PostCtrl {
         });
       }
 
-      const followers = await this.socialService.findFollowers(post.memberId);
+      const followers = await this.socialService.findFollowers(memberId);
 
       followers.forEach((member) => {
-        emailLib.sendPublishPostInfoToFollowers(member.member.displayEmail, post.url, post.memberId);
+        emailLib.sendPublishPostInfoToFollowers(member.member.displayEmail, post.url, memberId);
       });
 
       res.status(200).json({
