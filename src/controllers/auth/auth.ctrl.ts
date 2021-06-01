@@ -273,7 +273,7 @@ export class AuthCtrl {
         code,
         client_id: process.env.FACEBOOK_CLIENT_ID,
         client_secret: process.env.FACEBOOK_CLIENT_SECRET,
-        redirect_uri: 'https://work-it.co.kr/',
+        redirect_uri: config.replace + '/api/auth/callback/facebook',
       });
     
       const response = await axios.get<FacebookTokenResult>(
