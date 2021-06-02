@@ -164,9 +164,8 @@ export class AuthCtrl {
 
     try {
       const socialRedirect = onLoginWithSocialService(social, redirectUri);
-      console.log(socialRedirect);
       
-      res.redirect(encodeURI(socialRedirect));
+      res.redirect(socialRedirect);
     } catch (error) {
       colorConsole.error(error);
 
