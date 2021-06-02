@@ -2,6 +2,7 @@ import { Response } from 'express';
 import { Service } from "typedi";
 import qs from 'qs';
 import axios from 'axios';
+import { google } from 'googleapis';
 import dotenv from 'dotenv';
 
 import { AuthService } from "../../services/auth.service";
@@ -267,12 +268,10 @@ export class AuthCtrl {
   public redirectCallbackFacebook = async (req: AuthRequest, res: Response) => {
     colorConsole.info('[POST] facebook login api was called');
     const { code } = req.query;
-    console.log(code);
-    
 
     if (!code) {
-      res.status(400).json({
-        status: 400,
+      res.status(401).json({
+        status: 401,
         message: '요청 오류!',
       });
 
@@ -361,10 +360,83 @@ export class AuthCtrl {
     colorConsole.info('[GET] social google api callback');
     const { code } = req.query;
     console.log(code);
+
+    if (!code) {
+      res.status(401).json({
+        status: 401,
+        message: '요청 오류!',
+      });
+
+      return;
+    }
     
     try {
-    } catch (error) {
+      const oauth2Client = new google.auth.OAuth2(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET, config.replace + '/api/auth/callback/google');
 
+      const { tokens } = await oauth2Client.getToken(code as string);
+      const accessToken = tokens.access_token;
+      
+      const people = google.people('v1');
+      const profile = await people.people.get({
+        access_token: accessToken,
+        resourceName: 'people/me',
+        personFields: 'names,emailAddresses,photos'
+      });
+      const { data } = profile;
+
+      const id = data.resourceName!.replace('people/', '');
+      const profileImage = data.photos![0].url || null;
+      const name = data.names![0].displayName || 'name is empty';
+
+      const member = await this.authService.findUserBySocialId(id);
+
+      if (!member) {
+        const memberName = name || ' ';
+        const registerTokenInfo = {
+          memberName,
+          socialId: id,
+          profileImage,
+          memberId: '',
+        }
+
+        const token = tokenLib.createRegisterToken(registerTokenInfo);
+  
+        res.cookie('register_token', token, {
+          httpOnly: true,
+          maxAge: 1000 * 60 * 60 * 24 * 30,
+          domain: '.work-it.co.kr'
+        });
+
+        res.cookie('register_token', token, {
+          httpOnly: true,
+          maxAge: 1000 * 60 * 60 * 24 * 30,
+        });
+
+        res.redirect(encodeURI(`${config.clientUrl}/register/${id}`));                                                                                                                                                                                                          
+        return;
+      }
+      let userInfo = member;
+
+      const token = await tokenLib.createToken(userInfo.memberId, 1, profileImage);
+      const refreshToken = await tokenLib.createRefreshToken(userInfo.memberId, 1, profileImage);
+      const cookieTokens = {
+        accessToken: token,
+        refreshToken
+      }
+
+      delete userInfo.pw;
+      setTokensCookie(res, cookieTokens, userInfo.memberId);
+      
+      const redirectUrl = config.clientUrl;
+
+      res.redirect(encodeURI(redirectUrl));
+    } catch (error) {
+      colorConsole.error(error);
+
+      res.status(500).json({
+        status: 500,
+        message: '서버 에러',
+      });
     }
   }
 

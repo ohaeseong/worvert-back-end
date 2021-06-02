@@ -25,10 +25,7 @@ export function onLoginWithSocialService(social: string, redirectUri: string) {
               ],
               redirect_uri: redirectUri
             });
-            console.log(redirectUri);
-            
-            
-            
+
             return url;
         default:
             break;
