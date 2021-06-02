@@ -375,6 +375,7 @@ export class AuthCtrl {
 
       const { tokens } = await oauth2Client.getToken(code as string);
       const accessToken = tokens.access_token;
+      
       const people = google.people('v1');
       const profile = await people.people.get({
         access_token: accessToken,
