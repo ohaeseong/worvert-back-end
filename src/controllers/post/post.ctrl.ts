@@ -53,6 +53,7 @@ export class PostCtrl {
       const posts = await this.postService.getPostsByLimit(parseInt(limit, 10), category, kinds);
       const allPosts = await this.postService.getAllPostDataByCategory(category, kinds); 
       
+      
       const totalPage = Math.ceil(allPosts.length / parseInt(limit, 10));
 
       await asyncForeach(posts, async (post: PostDetail) => {

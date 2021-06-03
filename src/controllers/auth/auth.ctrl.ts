@@ -4,6 +4,7 @@ import qs from 'qs';
 import axios from 'axios';
 import { google } from 'googleapis';
 import dotenv from 'dotenv';
+import bcrypt from 'bcrypt';
 
 import { AuthService } from "../../services/auth.service";
 import { AuthRequest } from "../../typings";
@@ -67,10 +68,11 @@ export class AuthCtrl {
       const { memberId, pw } = body;
 
       // 회원 조회
-      const member = await this.authService.login(memberId, pw);
+      const member = await this.authService.findUserById(memberId);
+      const same = bcrypt.compareSync(pw, member.pw);
 
       // 회원 조회 실패
-      if (!member) {
+      if (!member || !same) {
         res.status(404).json({
           status: 404,
           message: '가입 되지 않는 회원!',
@@ -779,6 +781,7 @@ export class AuthCtrl {
 
       body.displayEmail = email;
       body.email = email;
+      body.pw = bcrypt.hashSync(body.pw, 10);
       
       const userInfo = await this.authService.createUser(body);
 
@@ -818,7 +821,6 @@ export class AuthCtrl {
   public getUserInfo = async (req: AuthRequest, res: Response) => {
     colorConsole.info('[GET] get user info by member id ');
     const memberId: string  = req.query.memberId as string;
-    console.log(memberId);
     
     // if (memberId === 'favicon.ico' || memberId === 'undefined') return;
 
