@@ -69,10 +69,8 @@ export class AuthCtrl {
 
       // 회원 조회
       const member = await this.authService.findUserById(memberId);
-      const same = bcrypt.compareSync(pw, member.pw);
-
-      // 회원 조회 실패
-      if (!member || !same) {
+      
+      if (!member) {
         res.status(404).json({
           status: 404,
           message: '가입 되지 않는 회원!',
@@ -80,6 +78,18 @@ export class AuthCtrl {
   
         return;
       }
+
+      const same = bcrypt.compareSync(pw, member.pw);
+
+      if (!same) {
+        res.status(403).json({
+          status: 403,
+          message: '비밀번호 혹은 아이디가 틀렸습니다.',
+        });
+  
+        return;
+      }
+    
 
       // 토큰 발급
       const token = await tokenLib.createToken(memberId, member.accessLevel, member.profileImage);
