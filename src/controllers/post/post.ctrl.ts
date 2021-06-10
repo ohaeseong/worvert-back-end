@@ -623,7 +623,7 @@ export class PostCtrl {
         slugUrl = `/${slugUrl.split("/")[1]}/${slugUrl.split("/")[2]}${uid}`;
       }
       
-      const updatePost = await this.postService.updatePostStatusToPublish(id, kinds, thumbnailAddress, category, slugUrl, intro, publishType);
+      await this.postService.updatePostStatusToPublish(id, kinds, thumbnailAddress, category, slugUrl, intro, publishType);
 
       await this.postTagService.deleteAllTags(id);
 
