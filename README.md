@@ -19,7 +19,3 @@ Library
 
 Database
 1. mysql
-
-서버 인프라 구성 안됨 (lamda, ec2 중 고민중)
-버그 모니터링 => slack api
-docker 자동 배포화, 모니터링
