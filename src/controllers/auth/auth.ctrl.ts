@@ -221,7 +221,7 @@ export class AuthCtrl {
         },
       });
 
-      const { id, avatar_url, login, name } = data;
+      const { id, avatar_url, login, name, email } = data;
 
       const member = await this.authService.findUserBySocialId(id);
 
@@ -232,6 +232,7 @@ export class AuthCtrl {
           socialId: id,
           profileImage: avatar_url,
           memberId: login,
+          email,
         }
 
         const token = tokenLib.createRegisterToken(registerTokenInfo);
@@ -313,7 +314,7 @@ export class AuthCtrl {
         }
       );
 
-      const { id, name } = profile.data;
+      const { id, name, email } = profile.data;
       
       const profileImage = `https://graph.facebook.com/v10.0/${id}/picture`;
       const member = await this.authService.findUserBySocialId(id);
@@ -325,6 +326,7 @@ export class AuthCtrl {
           socialId: id,
           profileImage,
           memberId: '',
+          email,
         }
 
         const token = tokenLib.createRegisterToken(registerTokenInfo);
@@ -371,7 +373,6 @@ export class AuthCtrl {
   public redirectCallbackGoogle = async (req: AuthRequest, res: Response) => {
     colorConsole.info('[GET] social google api callback');
     const { code } = req.query;
-    console.log(code);
 
     if (!code) {
       res.status(401).json({
@@ -399,6 +400,7 @@ export class AuthCtrl {
       const id = data.resourceName!.replace('people/', '');
       const profileImage = data.photos![0].url || null;
       const name = data.names![0].displayName || 'name is empty';
+      const email = data.emailAddresses[0].value;
 
       const member = await this.authService.findUserBySocialId(id);
 
@@ -409,6 +411,7 @@ export class AuthCtrl {
           socialId: id,
           profileImage,
           memberId: '',
+          email,
         }
 
         const token = tokenLib.createRegisterToken(registerTokenInfo);
@@ -462,7 +465,6 @@ export class AuthCtrl {
     }
     try {
       const decoded = await tokenLib.decodedToken(registerToken) as any;
-      console.log(decoded);
       
       res.status(200).json({
         status: 200,
@@ -522,7 +524,8 @@ export class AuthCtrl {
   }
 
   public createUserIdAndNameForSocial = async (req: AuthRequest, res: Response) => {
-    const { memberId, memberName, socialId, profileImage, introduce } = req.body;
+    colorConsole.info('[POST] create user by social');
+    const { memberId, memberName, socialId, profileImage, introduce, email } = req.body;
 
     if (!memberId || !memberName || !socialId) {
       res.status(400).json({
@@ -553,6 +556,8 @@ export class AuthCtrl {
         memberName,
         introduce,
         profileImage,
+        email,
+        displayEmail: email,
       };
 
       const memberCreateData = await this.authService.createUserWithGithub(memberData);
