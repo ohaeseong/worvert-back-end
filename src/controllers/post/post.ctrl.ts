@@ -635,9 +635,9 @@ export class PostCtrl {
 
       const followers = await this.socialService.findFollowers(memberId);
 
-      followers.forEach((member) => {
-        emailLib.sendPublishPostInfoToFollowers(member.member.displayEmail, post.url, memberId);
-      });
+      // followers.forEach((member) => {
+      //   emailLib.sendPublishPostInfoToFollowers(member.member.displayEmail, post.url, memberId);
+      // });
 
       res.status(200).json({
         status: 200,
