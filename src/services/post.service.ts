@@ -116,19 +116,29 @@ export class PostService {
     // all 조회
     if (!kinds) {
       const result = await this.postRepo.find({
+        relations:['member', 'comments', 'likes'],
         where: {
           category,
-        }
+          state: 1,
+        },
+        order: {
+          createTime: "DESC"
+        },
       });
   
       return result;
     }
 
     const result = await this.postRepo.find({
+      relations:['member', 'comments', 'likes'],
       where: {
         category,
-        kinds
-      }
+        kinds,
+        state: 1,
+      },
+      order: {
+        createTime: "DESC"
+      },
     });
 
     return result;
