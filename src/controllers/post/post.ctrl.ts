@@ -50,24 +50,23 @@ export class PostCtrl {
       
       
       // DB에 있는 데이터를 조회 합니다.
-      const posts = await this.postService.getPostsByLimit(parseInt(limit, 10), category, kinds);
+      // const posts = await this.postService.getPostsByLimit(parseInt(limit, 10), category, kinds);
       const allPosts = await this.postService.getAllPostDataByCategory(category, kinds); 
+      console.log(allPosts[allPosts.length - 1]);
       
       
-      const totalPage = Math.ceil(allPosts.length / parseInt(limit, 10));
+      // const totalPage = Math.ceil(allPosts.length / parseInt(limit, 10));
 
-      await asyncForeach(posts, async (post: PostDetail) => {
-        // const commentData = await this.commentService.getPostCommentListAll(post.id);
-        const likeData = await this.likeService.getAllLikeByPostId(post.id);
+      // await asyncForeach(allPosts, async (post: PostDetail) => {
+      //   const likeData = await this.likeService.getAllLikeByPostId(post.id);
         
-        // post.commentList = commentData.length;
-        post.like = likeData.length;
+      //   post.like = likeData.length;
 
-        delete post.member.pw;
-        delete post.member.accessLevel;
-      });
+      //   delete post.member.pw;
+      //   delete post.member.accessLevel;
+      // });
 
-      await asyncForeach(posts, async (post: PostDetail) => {
+      await asyncForeach(allPosts, async (post: PostDetail) => {
         let replyComments;
         if (post.comments) {
           post.commentCount = post.comments.length;
@@ -87,24 +86,25 @@ export class PostCtrl {
       const subtractToDay = dayjs(toDay).subtract(14, 'day').format('YYYY-MM-DD');
       
 
-      posts.sort((a: any, b: any) => {
-        return b.like - a.like;
+      allPosts.sort((a: any, b: any) => {
+        return b.likes.length - a.likes.length;
       });
 
-
-      for (let i = 0; i < posts.length; i++) {
-        if (subtractToDay > dayjs(posts[i].createTime).format('YYYY-MM-DD')) {
-          posts[posts.length - 1] =  posts[i];
-          posts.splice(i, 1);
+      for (let i = 0; i < allPosts.length; i++) {
+        if (subtractToDay > dayjs(allPosts[i].createTime).format('YYYY-MM-DD')) {
+          const spliceArray = allPosts.splice(i, 1);
+          allPosts.push(...spliceArray);
         }
       }
+
+      allPosts.splice(parseInt(limit, 10), allPosts.length);
 
       res.status(200).json({
         status: 200,
         message: '게시글 조회 성공',
         data: {
-          posts,
-          totalPage,
+          posts: [...allPosts],
+          // totalPage,
         }
       });
     } catch (error) {
