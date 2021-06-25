@@ -52,7 +52,6 @@ export class PostCtrl {
       // DB에 있는 데이터를 조회 합니다.
       // const posts = await this.postService.getPostsByLimit(parseInt(limit, 10), category, kinds);
       const allPosts = await this.postService.getAllPostDataByCategory(category, kinds); 
-      console.log(allPosts[allPosts.length - 1]);
       
       
       // const totalPage = Math.ceil(allPosts.length / parseInt(limit, 10));
