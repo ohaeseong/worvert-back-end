@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon --delay 1 --exec node --max-old-space-size=4096 -- node_modules/ts-node/dist/bin -P tsconfig.json src/app",
+    "start": "nodemon --watch src --delay 1 --exec ts-node ./src/app.ts",
     "dev": "cross-env NODE_ENV=development nodemon -e ts --exec ts-node ./src/app.ts",
     "test": "yarn mocha -w ./src/test/**/*.ts -r ts-node/register"
   },
