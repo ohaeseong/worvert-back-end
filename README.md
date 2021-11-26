@@ -1,4 +1,4 @@
-# tech-blog-server
+# worvert-server
 
 Start test command
 => yarn test
