@@ -4,8 +4,7 @@ import chaiHttp from 'chai-http';
 import config from '../../config';
 import { Member } from '../database/models/Member';
 import connectDatabase from '../database/connection';
-import { after, before } from 'mocha';
-import { Post } from '../database/models/Post';
+import { before } from 'mocha';
 
 chai.use(chaiHttp);
 
@@ -29,7 +28,6 @@ describe('MemberService Test', async () => {
             ...MemberFormData,
         });
     });
-
 
     context('Login test account', () => {
 

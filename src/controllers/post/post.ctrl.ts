@@ -48,12 +48,10 @@ export class PostCtrl {
 
     try {
       
-      
       // DB에 있는 데이터를 조회 합니다.
       // const posts = await this.postService.getPostsByLimit(parseInt(limit, 10), category, kinds);
       const allPosts = await this.postService.getAllPostDataByCategory(category, kinds); 
-      
-      
+
       // const totalPage = Math.ceil(allPosts.length / parseInt(limit, 10));
 
       // await asyncForeach(allPosts, async (post: PostDetail) => {
@@ -67,23 +65,19 @@ export class PostCtrl {
 
       await asyncForeach(allPosts, async (post: PostDetail) => {
         let replyComments;
-        if (post.comments) {
-          post.commentCount = post.comments.length;
-        }
+
+        if (post.comments) post.commentCount = post.comments.length;
+
         for(let i = 0; i < post.comments.length; i++) {
           const comment = post.comments[i];
           replyComments = await this.replyCommentService.getCommentByReplyCommentIdx(comment.idx);
   
-          if (replyComments) {
-            post.commentCount = post.commentCount + replyComments.length;
-          }
+          if (replyComments) post.commentCount = post.commentCount + replyComments.length;
         }
-      
       });
 
       let toDay = new Date();
       const subtractToDay = dayjs(toDay).subtract(14, 'day').format('YYYY-MM-DD');
-      
 
       allPosts.sort((a: any, b: any) => {
         return b.likes.length - a.likes.length;
@@ -103,7 +97,6 @@ export class PostCtrl {
         message: '게시글 조회 성공',
         data: {
           posts: [...allPosts],
-          // totalPage,
         }
       });
     } catch (error) {
