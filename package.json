@@ -6,7 +6,7 @@
   "scripts": {
     "start": "nodemon --watch src --delay 1 --exec ts-node ./src/app.ts",
     "dev": "cross-env NODE_ENV=development nodemon -e ts --exec ts-node ./src/app.ts",
-    "test": "yarn mocha -w ./src/test/**/*.ts -r ts-node/register"
+    "test": "mocha -watch ./src/test/**/*.ts -r ts-node/register"
   },
   "dependencies": {
     "@hapi/joi": "^17.1.1",

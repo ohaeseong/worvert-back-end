@@ -24,7 +24,7 @@ const option = { expiresIn: '1min', issuer: 'tech-diary.com boo!', subject: 'is 
 describe('Token Service Test', async () => {
 
     before(async () => {
-        refreshToken = await tokenLib.createRefreshToken('test refresh token');
+        refreshToken = await tokenLib.createRefreshToken('test refresh token', 0);
         refreshTokenUnauthorized = await jwt.sign(payload, 'test', option);
     });
 
