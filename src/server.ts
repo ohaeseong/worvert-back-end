@@ -1,6 +1,6 @@
 import express, { Express } from 'express';
 import HTTP from 'http';
-import HTTPS from 'https';
+// import HTTPS from 'https';
 import path from 'path';
 import cors from 'cors';
 import serveStatic from 'serve-static';
@@ -8,7 +8,7 @@ import RootRouter from './controllers';
 import connectDB from './database/connection';
 import Container from 'typedi';
 import cookieParser from 'cookie-parser';
-import fs from 'fs';
+// import fs from 'fs';
 
 
 class Server {
@@ -45,25 +45,25 @@ class Server {
 
     try {
       this.server.listen(port, () => {
-        console.log(`tech-diary Server is listening started on port ${port}`);
+        console.log(`worvert Server is listening started on port ${port}`);
       });
     } catch (error) {
       console.log(error);
     }
 
-    try {
-      const option = {
-        ca: fs.readFileSync('/etc/letsencrypt/live/work-it.co.kr/fullchain.pem'),
-        key: fs.readFileSync(path.resolve(process.cwd(), '/etc/letsencrypt/live/work-it.co.kr/privkey.pem'), 'utf8').toString(),
-        cert: fs.readFileSync(path.resolve(process.cwd(), '/etc/letsencrypt/live/work-it.co.kr/cert.pem'), 'utf8').toString(),
-      }
+    // try {
+    //   const option = {
+    //     ca: fs.readFileSync('/etc/letsencrypt/live/work-it.co.kr/fullchain.pem'),
+    //     key: fs.readFileSync(path.resolve(process.cwd(), '/etc/letsencrypt/live/work-it.co.kr/privkey.pem'), 'utf8').toString(),
+    //     cert: fs.readFileSync(path.resolve(process.cwd(), '/etc/letsencrypt/live/work-it.co.kr/cert.pem'), 'utf8').toString(),
+    //   }
 
-      HTTPS.createServer(option, this.app).listen(sslPort, () => {
-        console.log(`[HTTPS] tech-blog Server is started on port ${sslPort}`);
-      });
-    } catch (error) {
-      console.log('[HTTPS] HTTPS 오류가 발생하였습니다. HTTPS 서버는 실행되지 않습니다.', error);
-    }
+    //   HTTPS.createServer(option, this.app).listen(sslPort, () => {
+    //     console.log(`[HTTPS] tech-blog Server is started on port ${sslPort}`);
+    //   });
+    // } catch (error) {
+    //   console.log('[HTTPS] HTTPS 오류가 발생하였습니다. HTTPS 서버는 실행되지 않습니다.', error);
+    // }
   }
 }
 
